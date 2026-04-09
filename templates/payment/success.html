@@ -1,0 +1,108 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Payment Successful - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-success">
+                <div class="card-body text-center p-5">
+                    <!-- Success Icon -->
+                    <div class="mb-4">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <h2 class="text-success mb-3">Payment Successful!</h2>
+                    <p class="lead text-muted mb-4">Thank you for upgrading to Premium</p>
+                    
+                    <!-- Transaction Details -->
+                    <div class="card bg-light mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Transaction Details</h5>
+                            <div class="row text-start">
+                                <div class="col-6">
+                                    <strong>Transaction ID:</strong>
+                                </div>
+                                <div class="col-6">
+                                    {{ transaction_id }}
+                                </div>
+                            </div>
+                            <div class="row text-start mt-2">
+                                <div class="col-6">
+                                    <strong>Plan:</strong>
+                                </div>
+                                <div class="col-6">
+                                    {% if plan_type == 'PREMIUM_MONTHLY' %}
+                                    Premium Monthly
+                                    {% else %}
+                                    Premium Yearly
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row text-start mt-2">
+                                <div class="col-6">
+                                    <strong>Amount Paid:</strong>
+                                </div>
+                                <div class="col-6">
+                                    ₹{{ amount }}
+                                </div>
+                            </div>
+                            <div class="row text-start mt-2">
+                                <div class="col-6">
+                                    <strong>Payment Method:</strong>
+                                </div>
+                                <div class="col-6 text-capitalize">
+                                    {{ payment_method }}
+                                </div>
+                            </div>
+                            <div class="row text-start mt-2">
+                                <div class="col-6">
+                                    <strong>Date:</strong>
+                                </div>
+                                <div class="col-6">
+                                    {{ payment_date }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Success Message -->
+                    <div class="alert alert-success">
+                        <i class="bi bi-star-fill"></i> Your account has been upgraded to <strong>{{ plan_type }}</strong>
+                    </div>
+                    
+                    <!-- What's Next -->
+                    <div class="text-start mb-4">
+                        <h5>What's Next?</h5>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-check2 text-success"></i> Access IoT Device Control</li>
+                            <li class="mb-2"><i class="bi bi-check2 text-success"></i> Generate detailed energy bills</li>
+                            <li class="mb-2"><i class="bi bi-check2 text-success"></i> Unlimited consumption history</li>
+                            <li class="mb-2"><i class="bi bi-check2 text-success"></i> Advanced ML predictions</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('dashboard.index') }}" class="btn btn-success btn-lg">
+                            <i class="bi bi-house-door"></i> Go to Dashboard
+                        </a>
+                        <a href="{{ url_for('devices.index') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-cpu"></i> Manage IoT Devices
+                        </a>
+                        <a href="{{ url_for('payment.history') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-clock-history"></i> View Payment History
+                        </a>
+                    </div>
+                    
+                    <!-- Receipt Download -->
+                    <div class="mt-4 text-muted">
+                        <small><i class="bi bi-envelope"></i> A payment receipt has been sent to your email</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

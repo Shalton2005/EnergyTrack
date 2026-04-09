@@ -1,0 +1,162 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Billing - EnergyTrack{% endblock %}
+
+{% block content %}
+<!-- Predictive Bill Alert -->
+{% if monthly_kwh > 0 %}
+<div class="alert alert-{{ 'warning' if bill_details.total_cost > 1000 else 'info' }} alert-dismissible fade show mb-4" role="alert">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-lightning-charge-fill fs-3 me-3"></i>
+        <div>
+            <h5 class="alert-heading mb-1">
+                {% if bill_details.total_cost > 1000 %}
+                    ⚠️ Bill Alert: Projected to exceed ₹1,000
+                {% else %}
+                    💡 Your Bill is on Track
+                {% endif %}
+            </h5>
+            <p class="mb-1">
+                At current usage rate, your month-end bill will be approximately <strong>₹{{ (bill_details.total_cost * 30 / current_date.day)|round(0) }}</strong>
+            </p>
+            {% if bill_details.total_cost > 1000 %}
+            <small>
+                <strong>Tip:</strong> Reduce AC usage by 2 hours/day to save ₹300-500. 
+                Set temperature to 24°C instead of 18°C.
+            </small>
+            {% endif %}
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-receipt"></i> Billing & Tariff</h2>
+        <p class="text-muted">Monthly consumption and billing breakdown</p>
+    </div>
+</div>
+
+<!-- Monthly Summary -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Current Month Consumption</h5>
+                <h1 class="display-4 text-primary">{{ monthly_kwh }} <small class="text-muted">kWh</small></h1>
+                <p class="text-muted">{{ current_date.strftime('%B %Y') }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Estimated Bill</h5>
+                <h1 class="display-4 text-success">₹{{ bill_details.total_cost }}</h1>
+                <p class="text-muted">Including fixed charges</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Billing Breakdown -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Billing Breakdown</h5>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Slab</th>
+                            <th>Units Consumed</th>
+                            <th>Rate (₹/unit)</th>
+                            <th>Amount (₹)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Fixed Charges</strong></td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>₹{{ bill_details.fixed_charges }}</td>
+                        </tr>
+                        {% for slab in bill_details.breakdown %}
+                        <tr>
+                            <td>{{ slab.slab }}</td>
+                            <td>{{ slab.units|round(2) }}</td>
+                            <td>₹{{ slab.rate }}</td>
+                            <td>₹{{ slab.cost|round(2) }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="table-success fw-bold">
+                            <td colspan="3" class="text-end">Total Bill:</td>
+                            <td>₹{{ bill_details.total_cost }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Current Tariff -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Your Tariff Plan (Karnataka MESCOM)</h5>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Slab</th>
+                            <th>Rate (₹/unit)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Fixed Charges</td>
+                            <td>₹{{ tariff.fixed_charges }}</td>
+                        </tr>
+                        {% for slab in tariff.slabs %}
+                        <tr>
+                            <td>
+                                {% if slab.up_to %}
+                                    0 - {{ slab.up_to }} units
+                                {% else %}
+                                    Above {{ slab.above }} units
+                                {% endif %}
+                            </td>
+                            <td>₹{{ slab.rate }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="{{ url_for('dashboard.settings') }}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Update Tariff
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Consumption Comparison -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Cost Projection</h5>
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>Prediction:</strong> Based on your current consumption pattern, 
+                    your monthly bill is estimated to be <strong>₹{{ bill_details.total_cost }}</strong>.
+                    {% if bill_details.total_cost > 1000 %}
+                    Consider reducing consumption during peak hours to save money.
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

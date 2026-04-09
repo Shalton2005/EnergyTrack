@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Login - EnergyTrack{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Language Selector (Top Right) -->
+    <div class="position-absolute top-0 end-0 m-3">
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-translate"></i>
+                <span id="current-lang">English</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" onclick="changeLanguage('en'); return false;"><i class="bi bi-check-circle-fill text-success me-2" id="lang-en-check"></i>English</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeLanguage('hi'); return false;"><i class="bi bi-circle me-2" id="lang-hi-check"></i>हिन्दी (Hindi)</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeLanguage('kn'); return false;"><i class="bi bi-circle me-2" id="lang-kn-check"></i>ಕನ್ನಡ (Kannada)</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EnergyTrack Logo" class="auth-logo logo-animated" style="width: 100px; margin-bottom: 15px;">
+                            <h3 class="mt-2" data-translate="welcome_back">Welcome Back</h3>
+                            <p class="text-muted" data-translate="login_subtitle">Login to your EnergyTrack account</p>
+                        </div>
+                        
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <form method="POST" action="{{ url_for('auth.login') }}">
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="email_address">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control" name="email" placeholder="name@example.com" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="password">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input type="password" class="form-control" name="password" placeholder="Enter password" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" name="remember" id="remember">
+                                <label class="form-check-label" for="remember" data-translate="remember_me">Remember me</label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                                <i class="bi bi-box-arrow-in-right"></i> <span data-translate="login">Login</span>
+                            </button>
+                            
+                            <div class="text-center">
+                                <a href="{{ url_for('auth.forgot_password') }}" class="text-decoration-none" data-translate="forgot_password">Forgot Password?</a>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="text-center">
+                                <p class="mb-0"><span data-translate="no_account">Don't have an account?</span> <a href="{{ url_for('auth.register') }}" data-translate="register_here">Register here</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                
+                <div class="text-center mt-3">
+                    <a href="/" class="text-white text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> <span data-translate="back_to_home">Back to Home</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Language translations for auth pages
+    const translations = {
+        'en': {
+            'welcome_back': 'Welcome Back',
+            'login_subtitle': 'Login to your EnergyTrack account',
+            'email_address': 'Email Address',
+            'password': 'Password',
+            'remember_me': 'Remember me',
+            'login': 'Login',
+            'forgot_password': 'Forgot Password?',
+            'no_account': "Don't have an account?",
+            'register_here': 'Register here',
+            'back_to_home': 'Back to Home'
+        },
+        'hi': {
+            'welcome_back': 'वापसी पर स्वागत है',
+            'login_subtitle': 'अपने EnergyTrack खाते में लॉगिन करें',
+            'email_address': 'ईमेल पता',
+            'password': 'पासवर्ड',
+            'remember_me': 'मुझे याद रखें',
+            'login': 'लॉगिन',
+            'forgot_password': 'पासवर्ड भूल गए?',
+            'no_account': 'खाता नहीं है?',
+            'register_here': 'यहाँ पंजीकरण करें',
+            'back_to_home': 'होम पर वापस जाएं'
+        },
+        'kn': {
+            'welcome_back': 'ಮರಳಿ ಸುಸ್ವಾಗತ',
+            'login_subtitle': 'ನಿಮ್ಮ EnergyTrack ಖಾತೆಗೆ ಲಾಗಿನ್ ಮಾಡಿ',
+            'email_address': 'ಇಮೇಲ್ ವಿಳಾಸ',
+            'password': 'ಪಾಸ್‌ವರ್ಡ್',
+            'remember_me': 'ನನ್ನನ್ನು ನೆನಪಿಡಿ',
+            'login': 'ಲಾಗಿನ್',
+            'forgot_password': 'ಪಾಸ್‌ವರ್ಡ್ ಮರೆತಿರಾ?',
+            'no_account': 'ಖಾತೆ ಇಲ್ಲವೇ?',
+            'register_here': 'ಇಲ್ಲಿ ನೋಂದಾಯಿಸಿ',
+            'back_to_home': 'ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ'
+        }
+    };
+    
+    function changeLanguage(lang) {
+        localStorage.setItem('preferredLanguage', lang);
+        
+        // Update check marks
+        ['en', 'hi', 'kn'].forEach(l => {
+            const check = document.getElementById(`lang-${l}-check`);
+            if (check) {
+                check.className = l === lang ? 'bi bi-check-circle-fill text-success me-2' : 'bi bi-circle me-2';
+            }
+        });
+        
+        // Update current language display
+        const langNames = {'en': 'English', 'hi': 'हिन्दी', 'kn': 'ಕನ್ನಡ'};
+        const currentLangEl = document.getElementById('current-lang');
+        if (currentLangEl) {
+            currentLangEl.textContent = langNames[lang];
+        }
+        
+        // Apply translations to elements with data-translate attribute
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            if (translations[lang] && translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+    }
+    
+    // Load saved language on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+        changeLanguage(savedLang);
+    });
+</script>
+{% endblock %}
+

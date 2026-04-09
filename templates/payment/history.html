@@ -1,0 +1,146 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Payment History - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="bi bi-clock-history"></i> Payment History</h2>
+    
+    <!-- Current Plan Info -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0">Current Plan: 
+                        <span class="badge bg-{% if current_user.plan_type == 'FREE' %}secondary{% else %}success{% endif %}">
+                            {{ current_user.plan_type }}
+                        </span>
+                    </h5>
+                    {% if current_user.trial_days_remaining() > 0 %}
+                    <small class="text-muted">Trial ends in {{ current_user.trial_days_remaining() }} days</small>
+                    {% endif %}
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="{{ url_for('payment.upgrade') }}" class="btn btn-primary">
+                        <i class="bi bi-rocket-takeoff"></i> Upgrade Plan
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment History Table -->
+    {% if payments %}
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">All Transactions</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Transaction ID</th>
+                            <th>Date</th>
+                            <th>Plan</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr>
+                            <td>
+                                <code>{{ payment.transaction_id }}</code>
+                            </td>
+                            <td>{{ payment.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+                            <td>
+                                {% if payment.plan_type == 'PREMIUM_MONTHLY' %}
+                                <span class="badge bg-primary">Premium Monthly</span>
+                                {% elif payment.plan_type == 'PREMIUM_YEARLY' %}
+                                <span class="badge bg-success">Premium Yearly</span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ payment.plan_type }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="fw-bold">₹{{ payment.amount }}</td>
+                            <td class="text-capitalize">
+                                {% if payment.payment_method == 'card' %}
+                                <i class="bi bi-credit-card"></i> Card
+                                {% elif payment.payment_method == 'upi' %}
+                                <i class="bi bi-phone"></i> UPI
+                                {% elif payment.payment_method == 'netbanking' %}
+                                <i class="bi bi-bank"></i> Net Banking
+                                {% else %}
+                                {{ payment.payment_method }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if payment.status == 'SUCCESS' %}
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle"></i> Success
+                                </span>
+                                {% elif payment.status == 'FAILED' %}
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-x-circle"></i> Failed
+                                </span>
+                                {% elif payment.status == 'PENDING' %}
+                                <span class="badge bg-warning">
+                                    <i class="bi bi-clock"></i> Pending
+                                </span>
+                                {% else %}
+                                <span class="badge bg-secondary">{{ payment.status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Summary Stats -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Transactions</h6>
+                    <h3>{{ payments|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Spent</h6>
+                    <h3>₹{{ payments|selectattr('status', 'equalto', 'SUCCESS')|map(attribute='amount')|sum }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Successful Payments</h6>
+                    <h3>{{ payments|selectattr('status', 'equalto', 'SUCCESS')|list|length }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% else %}
+    <!-- No Payments -->
+    <div class="card shadow">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+            <h4 class="text-muted mt-3">No Payment History</h4>
+            <p class="text-muted">You haven't made any payments yet</p>
+            <a href="{{ url_for('payment.upgrade') }}" class="btn btn-primary mt-3">
+                <i class="bi bi-rocket-takeoff"></i> Upgrade to Premium
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

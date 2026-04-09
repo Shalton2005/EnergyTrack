@@ -1,0 +1,167 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Settings - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="bi bi-gear"></i> System Settings</h2>
+    
+    <!-- Email Configuration -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header text-white" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">
+            <h5 class="mb-0"><i class="bi bi-envelope"></i> Email Configuration</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Update email settings dynamically. Changes apply immediately.
+            </div>
+            
+            <form method="POST">
+                <div class="mb-3">
+                    <label class="form-label"><strong>Admin Email</strong></label>
+                    <input type="email" class="form-control" name="admin_email" placeholder="admin@energytrack.com" value="{{ config.ADMIN_EMAIL or 'admin@example.com' }}" required>
+                    <small class="text-muted">Primary admin contact email</small>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><strong>SMTP Server</strong></label>
+                        <input type="text" class="form-control" name="mail_server" placeholder="smtp.gmail.com" value="{{ config.MAIL_SERVER or '' }}">
+                        <small class="text-muted">e.g., smtp.gmail.com</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><strong>SMTP Port</strong></label>
+                        <input type="number" class="form-control" name="mail_port" placeholder="587" value="{{ config.MAIL_PORT or 587 }}">
+                        <small class="text-muted">Usually 587 (TLS) or 465 (SSL)</small>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><strong>Email Username</strong></label>
+                        <input type="email" class="form-control" name="mail_username" placeholder="your-email@example.com" value="{{ config.MAIL_USERNAME or '' }}">
+                        <small class="text-muted">SMTP authentication username</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label"><strong>Email Password</strong></label>
+                        <input type="password" class="form-control" name="mail_password" placeholder="Enter password to update">
+                        <small class="text-muted">SMTP authentication password (App Password for Gmail)</small>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>Current Status:</strong> 
+                    {% if config.MAIL_USERNAME %}
+                    <span class="badge bg-success">✓ SMTP Configured</span>
+                    {% else %}
+                    <span class="badge bg-warning">⚠ SMTP Not Configured</span>
+                    {% endif %}
+                    <span class="badge bg-info ms-2">Admin: {{ config.ADMIN_EMAIL or 'Not Set' }}</span>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Save Email Settings
+                </button>
+            </form>
+            
+            <hr>
+            
+            <h6 class="mb-3"><i class="bi bi-code-square"></i> Sample .env Configuration</h6>
+            <pre class="bg-dark text-light p-3 rounded"><code># Email Configuration
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=your-email@example.com
+MAIL_PASSWORD=your-app-password
+MAIL_DEFAULT_SENDER=noreply@energytrack.com</code></pre>
+            
+            <div class="alert alert-warning">
+                <strong>Note for Gmail users:</strong> You need to create an "App Password" from your Google Account settings. Don't use your regular Gmail password.
+                <br>
+                <a href="https://support.google.com/accounts/answer/185833" target="_blank">Learn how to create App Password</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- General Settings -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0"><i class="bi bi-sliders"></i> General Settings</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><strong>Application Name</strong></label>
+                    <input type="text" class="form-control" value="EnergyTrack" readonly>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label"><strong>Current Admin</strong></label>
+                    <input type="email" class="form-control" value="{{ current_user.email }}" readonly>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label class="form-label"><strong>Subscription Plans</strong></label>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Plan</th>
+                                <th>Price</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FREE</td>
+                                <td>₹0</td>
+                                <td>Unlimited</td>
+                            </tr>
+                            <tr>
+                                <td>PREMIUM_MONTHLY</td>
+                                <td>₹99</td>
+                                <td>1 Month</td>
+                            </tr>
+                            <tr>
+                                <td>PREMIUM_YEARLY</td>
+                                <td>₹999</td>
+                                <td>1 Year</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Security Settings -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0"><i class="bi bi-shield-check"></i> Security Settings</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i> <strong>Important:</strong> Keep your admin credentials secure!
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Admin Account</h6>
+                    <p class="text-muted">Email: {{ current_user.email }}</p>
+                    <p class="text-muted">Role: Administrator</p>
+                    <button class="btn btn-outline-danger btn-sm">Change Password</button>
+                </div>
+                <div class="col-md-6">
+                    <h6>Security Recommendations</h6>
+                    <ul class="small">
+                        <li>Use strong passwords (min 12 characters)</li>
+                        <li>Enable two-factor authentication (2FA)</li>
+                        <li>Regularly review user access logs</li>
+                        <li>Keep the system updated</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

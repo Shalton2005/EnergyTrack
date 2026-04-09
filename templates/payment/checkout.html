@@ -1,0 +1,195 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Checkout - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4"><i class="bi bi-credit-card"></i> Complete Your Payment</h2>
+            
+            <!-- Order Summary -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Plan:</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            {% if plan_type == 'PREMIUM_MONTHLY' %}
+                            Premium Monthly
+                            {% else %}
+                            Premium Yearly
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <strong>Amount:</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            ₹{{ amount }}
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-6">
+                            <strong>GST (18%):</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            ₹{{ "%.2f"|format(amount * 0.18) }}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <h5>Total:</h5>
+                        </div>
+                        <div class="col-6 text-end">
+                            <h5>₹{{ "%.2f"|format(amount * 1.18) }}</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Form -->
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Payment Details</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('payment.process_payment') }}">
+                        <input type="hidden" name="plan_type" value="{{ plan_type }}">
+                        <input type="hidden" name="amount" value="{{ amount }}">
+                        
+                        <!-- Payment Method -->
+                        <div class="mb-4">
+                            <label class="form-label"><strong>Payment Method</strong></label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="payment_method" id="card" value="card" checked>
+                                <label class="btn btn-outline-primary" for="card">
+                                    <i class="bi bi-credit-card"></i> Card
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="payment_method" id="upi" value="upi">
+                                <label class="btn btn-outline-primary" for="upi">
+                                    <i class="bi bi-phone"></i> UPI
+                                </label>
+                                
+                                <input type="radio" class="btn-check" name="payment_method" id="netbanking" value="netbanking">
+                                <label class="btn btn-outline-primary" for="netbanking">
+                                    <i class="bi bi-bank"></i> Net Banking
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Card Details (Dummy) -->
+                        <div id="cardDetails" class="payment-section">
+                            <div class="mb-3">
+                                <label for="cardNumber" class="form-label">Card Number</label>
+                                <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="expiry" class="form-label">Expiry Date</label>
+                                    <input type="text" class="form-control" id="expiry" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="cvv" class="form-label">CVV</label>
+                                    <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- UPI Details (Dummy) -->
+                        <div id="upiDetails" class="payment-section" style="display:none;">
+                            <div class="mb-3">
+                                <label for="upiId" class="form-label">UPI ID</label>
+                                <input type="text" class="form-control" id="upiId" placeholder="yourname@upi">
+                            </div>
+                        </div>
+                        
+                        <!-- Net Banking Details (Dummy) -->
+                        <div id="netbankingDetails" class="payment-section" style="display:none;">
+                            <div class="mb-3">
+                                <label for="bank" class="form-label">Select Bank</label>
+                                <select class="form-select" id="bank">
+                                    <option selected>Choose your bank...</option>
+                                    <option>State Bank of India</option>
+                                    <option>HDFC Bank</option>
+                                    <option>ICICI Bank</option>
+                                    <option>Axis Bank</option>
+                                    <option>Bank of Baroda</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Simulation Control -->
+                        <div class="alert alert-warning">
+                            <strong><i class="bi bi-info-circle"></i> Test Mode:</strong> This is a dummy payment gateway for demonstration.
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="simulateSuccess" name="simulate_success" checked>
+                                <label class="form-check-label" for="simulateSuccess">
+                                    Simulate Successful Payment (uncheck for failure)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-lock-fill"></i> Pay ₹{{ "%.2f"|format(amount * 1.18) }}
+                            </button>
+                            <a href="{{ url_for('payment.upgrade') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                        
+                        <div class="text-center mt-3 text-muted small">
+                            <i class="bi bi-shield-check"></i> Your payment is secure and encrypted
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Toggle payment method sections
+document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        document.getElementById('cardDetails').style.display = 'none';
+        document.getElementById('upiDetails').style.display = 'none';
+        document.getElementById('netbankingDetails').style.display = 'none';
+        
+        if(this.value === 'card') {
+            document.getElementById('cardDetails').style.display = 'block';
+        } else if(this.value === 'upi') {
+            document.getElementById('upiDetails').style.display = 'block';
+        } else if(this.value === 'netbanking') {
+            document.getElementById('netbankingDetails').style.display = 'block';
+        }
+    });
+});
+
+// Format card number
+document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formattedValue;
+});
+
+// Format expiry date
+document.getElementById('expiry')?.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if(value.length >= 2) {
+        e.target.value = value.slice(0,2) + '/' + value.slice(2,4);
+    } else {
+        e.target.value = value;
+    }
+});
+</script>
+{% endblock %}

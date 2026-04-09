@@ -1,0 +1,519 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Settings - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-gear-fill"></i> Settings</h2>
+        <p class="text-muted">Manage your account and preferences</p>
+    </div>
+</div>
+
+<!-- Tariff Settings -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h5 class="card-title mb-1"><i class="bi bi-calculator"></i> Tariff Configuration</h5>
+                        <p class="text-muted mb-0">Update your electricity tariff slabs for accurate billing calculations</p>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleTariffMode()">
+                        <i class="bi bi-code-slash"></i> <span id="mode-toggle-text">JSON Mode</span>
+                    </button>
+                </div>
+                
+                <!-- User-Friendly Form Mode (Default) -->
+                <div id="tariff-form-mode">
+                    <form id="tariff-form-ui" onsubmit="updateTariffFromForm(event)">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i> <strong>How it works:</strong> 
+                                    Configure your electricity provider's tariff structure. Fixed charges are applied monthly, and slab rates are charged per kWh based on consumption.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card bg-light mb-3">
+                                    <div class="card-body">
+                                        <label class="form-label fw-bold">
+                                            <i class="bi bi-cash-coin text-primary"></i> Fixed Monthly Charge
+                                        </label>
+                                        <div class="input-group input-group-lg">
+                                            <span class="input-group-text">Rs.</span>
+                                            <input type="number" class="form-control" id="fixed-charges" name="fixed_charges" 
+                                                   value="{{ tariff.fixed_charges }}" min="0" step="0.01" required>
+                                        </div>
+                                        <small class="text-muted">Base charge applied every month</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-8">
+                                <div class="card bg-light mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <label class="form-label fw-bold mb-0">
+                                                <i class="bi bi-layers text-success"></i> Consumption Slabs
+                                            </label>
+                                            <button type="button" class="btn btn-sm btn-success" onclick="addSlabRow()">
+                                                <i class="bi bi-plus-circle"></i> Add Slab
+                                            </button>
+                                        </div>
+                                        
+                                        <div id="slabs-container">
+                                            <!-- Slab rows will be dynamically generated -->
+                                        </div>
+                                        
+                                        <small class="text-muted">
+                                            <i class="bi bi-lightbulb"></i> Slabs are charged progressively. Example: If you consume 150 kWh, 
+                                            first 50 units at Slab 1 rate, next 50 at Slab 2 rate, and remaining 50 at Slab 3 rate.
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card border-primary">
+                                    <div class="card-body">
+                                        <h6 class="text-primary"><i class="bi bi-eye"></i> Tariff Preview</h6>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-hover" id="tariff-preview-table">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Slab</th>
+                                                        <th>Consumption Range</th>
+                                                        <th>Rate (Rs./kWh)</th>
+                                                        <th>Example: 100 kWh Bill</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="preview-tbody">
+                                                    <!-- Preview will be generated here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-save"></i> Update Tariff
+                            </button>
+                            <button type="button" class="btn btn-secondary btn-lg" onclick="resetToDefault()">
+                                <i class="bi bi-arrow-clockwise"></i> Reset to Default
+                            </button>
+                        </div>
+                    </form>
+                    <div id="tariff-message-ui" class="mt-3"></div>
+                </div>
+                
+                <!-- JSON Mode (Hidden by default) -->
+                <div id="tariff-json-mode" style="display: none;">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Current Tariff</h6>
+                            <pre class="bg-light p-3 rounded border" id="current-tariff">{{ tariff|tojson(indent=2) }}</pre>
+                        </div>
+                        <div class="col-md-6">
+                            <form id="tariff-form" onsubmit="updateTariff(event)">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Tariff JSON</label>
+                                    <textarea class="form-control font-monospace" name="tariff_json" rows="12" required>{{ tariff|tojson(indent=2) }}</textarea>
+                                    <div class="form-text">Edit the JSON to match your local tariff rates</div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Update Tariff
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="resetToDefault()">
+                                    <i class="bi bi-arrow-clockwise"></i> Reset to Default
+                                </button>
+                            </form>
+                            <div id="tariff-message" class="mt-3"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info mt-3">
+                        <strong><i class="bi bi-code-square"></i> JSON Format:</strong>
+                        <pre class="mb-0 mt-2">{
+  "fixed_charges": 100,
+  "slabs": [
+    {"up_to": 50, "rate": 3.40},
+    {"up_to": 100, "rate": 4.95},
+    {"up_to": 200, "rate": 6.50},
+    {"above": 200, "rate": 7.55}
+  ]
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Preferences -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Alert Preferences</h5>
+                <form id="alerts-form" onsubmit="updateAlerts(event)">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="voltage_alerts" id="voltage_alerts" 
+                               {% if current_user.voltage_alerts %}checked{% endif %}>
+                        <label class="form-check-label" for="voltage_alerts">
+                            <strong>Voltage Fluctuation Alerts</strong><br>
+                            <small class="text-muted">Get notified when voltage goes below 220V or above 240V</small>
+                        </label>
+                    </div>
+                    
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="bill_alerts" id="bill_alerts"
+                               {% if current_user.bill_alerts %}checked{% endif %}>
+                        <label class="form-check-label" for="bill_alerts">
+                            <strong>Bill Prediction Alerts</strong><br>
+                            <small class="text-muted">Receive alerts about projected monthly bill estimates</small>
+                        </label>
+                    </div>
+                    
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" name="email_notifications" id="email_notifications"
+                               {% if current_user.email_notifications %}checked{% endif %}>
+                        <label class="form-check-label" for="email_notifications">
+                            <strong>Email Notifications</strong><br>
+                            <small class="text-muted">Send alerts and reports to your email</small>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-bell"></i> Save Preferences
+                    </button>
+                </form>
+                <div id="alerts-message" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentTariff = {{ tariff|tojson }};
+    
+    // Initialize tariff form on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTariffSlabs();
+        updatePreview();
+    });
+    
+    // Toggle between form mode and JSON mode
+    function toggleTariffMode() {
+        const formMode = document.getElementById('tariff-form-mode');
+        const jsonMode = document.getElementById('tariff-json-mode');
+        const toggleText = document.getElementById('mode-toggle-text');
+        
+        if (formMode.style.display === 'none') {
+            formMode.style.display = 'block';
+            jsonMode.style.display = 'none';
+            toggleText.textContent = 'JSON Mode';
+        } else {
+            formMode.style.display = 'none';
+            jsonMode.style.display = 'block';
+            toggleText.textContent = 'Form Mode';
+        }
+    }
+    
+    // Load tariff slabs into the form
+    function loadTariffSlabs() {
+        const container = document.getElementById('slabs-container');
+        container.innerHTML = '';
+        
+        currentTariff.slabs.forEach((slab, index) => {
+            addSlabRow(slab, index);
+        });
+    }
+    
+    // Add a slab row
+    function addSlabRow(slab = null, index = null) {
+        const container = document.getElementById('slabs-container');
+        const slabIndex = index !== null ? index : container.children.length;
+        const isLast = slab && slab.above !== undefined;
+        
+        const slabRow = document.createElement('div');
+        slabRow.className = 'row mb-2 align-items-center slab-row';
+        slabRow.dataset.index = slabIndex;
+        
+        slabRow.innerHTML = `
+            <div class="col-md-1">
+                <div class="badge bg-primary fs-6">${slabIndex + 1}</div>
+            </div>
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text">${isLast ? 'Above' : 'Up to'}</span>
+                    <input type="number" class="form-control slab-limit" 
+                           name="slab_${slabIndex}_limit" 
+                           value="${slab ? (slab.up_to || slab.above || '') : ''}" 
+                           min="0" step="1" required
+                           onchange="updatePreview()"
+                           ${isLast ? 'readonly' : ''}>
+                    <span class="input-group-text">kWh</span>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text">Rs.</span>
+                    <input type="number" class="form-control slab-rate" 
+                           name="slab_${slabIndex}_rate" 
+                           value="${slab ? slab.rate : ''}" 
+                           min="0" step="0.01" required
+                           onchange="updatePreview()">
+                    <span class="input-group-text">/ kWh</span>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSlabRow(${slabIndex})" 
+                        ${container.children.length <= 1 ? 'disabled' : ''}>
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(slabRow);
+        updatePreview();
+    }
+    
+    // Remove a slab row
+    function removeSlabRow(index) {
+        const container = document.getElementById('slabs-container');
+        const rows = container.querySelectorAll('.slab-row');
+        
+        if (rows.length > 1) {
+            rows[index].remove();
+            // Reindex remaining rows
+            container.querySelectorAll('.slab-row').forEach((row, newIndex) => {
+                row.dataset.index = newIndex;
+                row.querySelector('.badge').textContent = newIndex + 1;
+            });
+            updatePreview();
+        }
+    }
+    
+    // Update preview table
+    function updatePreview() {
+        const fixedCharge = parseFloat(document.getElementById('fixed-charges').value) || 0;
+        const slabRows = document.querySelectorAll('.slab-row');
+        const previewBody = document.getElementById('preview-tbody');
+        
+        previewBody.innerHTML = '';
+        
+        let totalFor100 = fixedCharge;
+        let consumedUnits = 0;
+        
+        slabRows.forEach((row, index) => {
+            const limit = parseFloat(row.querySelector('.slab-limit').value) || 0;
+            const rate = parseFloat(row.querySelector('.slab-rate').value) || 0;
+            
+            const isLast = index === slabRows.length - 1;
+            const rangeText = index === 0 
+                ? `0 - ${limit} kWh` 
+                : isLast 
+                    ? `Above ${limit} kWh`
+                    : `${slabRows[index-1].querySelector('.slab-limit').value} - ${limit} kWh`;
+            
+            // Calculate for 100 kWh example
+            let unitsInThisSlab = 0;
+            let chargeInThisSlab = 0;
+            
+            if (consumedUnits < 100) {
+                if (isLast) {
+                    unitsInThisSlab = 100 - consumedUnits;
+                } else {
+                    unitsInThisSlab = Math.min(limit - consumedUnits, 100 - consumedUnits);
+                }
+                chargeInThisSlab = unitsInThisSlab * rate;
+                totalFor100 += chargeInThisSlab;
+                consumedUnits += unitsInThisSlab;
+            }
+            
+            const exampleText = unitsInThisSlab > 0 
+                ? `${unitsInThisSlab.toFixed(0)} units × Rs.${rate.toFixed(2)} = Rs.${chargeInThisSlab.toFixed(2)}`
+                : '—';
+            
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><span class="badge bg-primary">Slab ${index + 1}</span></td>
+                <td>${rangeText}</td>
+                <td><strong>Rs. ${rate.toFixed(2)}</strong></td>
+                <td class="text-muted">${exampleText}</td>
+            `;
+            previewBody.appendChild(tr);
+        });
+        
+        // Add total row
+        const totalRow = document.createElement('tr');
+        totalRow.className = 'table-success fw-bold';
+        totalRow.innerHTML = `
+            <td colspan="3" class="text-end">Total Bill for 100 kWh (including fixed charge):</td>
+            <td><strong>Rs. ${totalFor100.toFixed(2)}</strong></td>
+        `;
+        previewBody.appendChild(totalRow);
+    }
+    
+    // Update tariff from form
+    function updateTariffFromForm(event) {
+        event.preventDefault();
+        
+        const fixedCharges = parseFloat(document.getElementById('fixed-charges').value);
+        const slabRows = document.querySelectorAll('.slab-row');
+        
+        const slabs = [];
+        slabRows.forEach((row, index) => {
+            const limit = parseFloat(row.querySelector('.slab-limit').value);
+            const rate = parseFloat(row.querySelector('.slab-rate').value);
+            
+            if (index === slabRows.length - 1) {
+                // Last slab is "above"
+                slabs.push({ above: limit, rate: rate });
+            } else {
+                slabs.push({ up_to: limit, rate: rate });
+            }
+        });
+        
+        const tariffData = {
+            fixed_charges: fixedCharges,
+            slabs: slabs
+        };
+        
+        // Submit to server
+        const formData = new FormData();
+        formData.append('action', 'update_tariff');
+        formData.append('tariff_json', JSON.stringify(tariffData));
+        
+        fetch('{{ url_for("dashboard.settings") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageDiv = document.getElementById('tariff-message-ui');
+            if (data.success) {
+                messageDiv.innerHTML = '<div class="alert alert-success"><i class="bi bi-check-circle"></i> ' + data.message + '</div>';
+                currentTariff = tariffData;
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                messageDiv.innerHTML = '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> ' + data.error + '</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('tariff-message-ui').innerHTML = 
+                '<div class="alert alert-danger"><i class="bi bi-x-circle"></i> Error updating tariff</div>';
+        });
+    }
+    
+    function updatePassword(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        formData.append('action', 'update_password');
+        
+        fetch('{{ url_for("dashboard.settings") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageDiv = document.getElementById('password-message');
+            if (data.success) {
+                messageDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+                form.reset();
+            } else {
+                messageDiv.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('password-message').innerHTML = 
+                '<div class="alert alert-danger">Error updating password</div>';
+        });
+    }
+    
+    function updateTariff(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        formData.append('action', 'update_tariff');
+        
+        fetch('{{ url_for("dashboard.settings") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageDiv = document.getElementById('tariff-message');
+            if (data.success) {
+                messageDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                messageDiv.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('tariff-message').innerHTML = 
+                '<div class="alert alert-danger">Error updating tariff</div>';
+        });
+    }
+    
+    function updateAlerts(event) {
+        event.preventDefault();
+        const form = event.target;
+        const formData = new FormData(form);
+        formData.append('action', 'update_alerts');
+        
+        fetch('{{ url_for("dashboard.settings") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageDiv = document.getElementById('alerts-message');
+            if (data.success) {
+                messageDiv.innerHTML = '<div class="alert alert-success">' + data.message + '</div>';
+            } else {
+                messageDiv.innerHTML = '<div class="alert alert-danger">' + data.error + '</div>';
+            }
+        })
+        .catch(error => {
+            document.getElementById('alerts-message').innerHTML = 
+                '<div class="alert alert-danger">Error updating preferences</div>';
+        });
+    }
+    
+    function resetToDefault() {
+        const defaultTariff = {
+            "fixed_charges": 100,
+            "slabs": [
+                {"up_to": 50, "rate": 3.40},
+                {"up_to": 100, "rate": 4.95},
+                {"up_to": 200, "rate": 6.50},
+                {"above": 200, "rate": 7.55}
+            ]
+        };
+        
+        // Update form mode
+        document.getElementById('fixed-charges').value = defaultTariff.fixed_charges;
+        currentTariff = defaultTariff;
+        loadTariffSlabs();
+        updatePreview();
+        
+        // Update JSON mode
+        document.querySelector('[name="tariff_json"]').value = JSON.stringify(defaultTariff, null, 2);
+    }
+</script>
+{% endblock %}

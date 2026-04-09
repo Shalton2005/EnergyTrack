@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - EnergyTrack{% endblock %}
+
+{% block body %}
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark" style="background-color: var(--primary-color);">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EnergyTrack Logo" class="logo-animated" style="height: 50px; margin-right: 10px;">
+            EnergyTrack
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#features">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#pricing">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#support">Support</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-light text-dark ms-2 px-4 fw-bold" href="{{ url_for('auth.register') }}" style="border-radius: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">Get Started</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; min-height: 90vh; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4 animate__animated animate__fadeInUp">Take Control of Your Energy Consumption</h1>
+                <p class="lead mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+                    Monitor, analyze, and optimize your electricity usage with AI-powered insights. 
+                    Save money, reduce waste, and contribute to a sustainable future.
+                </p>
+                <div class="d-flex gap-3 mb-4 animate__animated animate__fadeInUp animate__delay-2s">
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-5" style="border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                        <i class="bi bi-rocket-takeoff"></i> Start Free Trial
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg px-4" style="border-radius: 30px;">
+                        Learn More
+                    </a>
+                </div>
+                <div class="d-flex gap-4 text-white-50">
+                    <div><i class="bi bi-check-circle-fill text-white"></i> 30-Day Free Trial</div>
+                    <div><i class="bi bi-check-circle-fill text-white"></i> No Credit Card Required</div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <i class="bi bi-lightning-charge-fill" style="font-size: 20rem; opacity: 0.15; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"></i>
+                    <div class="card shadow-lg p-4 bg-white text-dark" style="border-radius: 20px; transform: rotate(-2deg);">
+                        <h4 class="text-primary mb-3"><i class="bi bi-graph-up-arrow"></i> Real-Time Analytics</h4>
+                        <div class="progress mb-2" style="height: 25px;">
+                            <div class="progress-bar bg-success" style="width: 67%">67% Efficient</div>
+                        </div>
+                        <small class="text-muted">You're saving ₹450/month compared to average users!</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5" id="features">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Why Choose EnergyTrack?</h2>
+            <p class="lead text-muted">Powerful features to help you save energy and money</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 border-0 shadow-sm hover-lift" style="transition: transform 0.3s;">
+                    <div class="mb-3">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex p-3">
+                            <i class="bi bi-graph-up-arrow text-primary" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold">Real-Time Monitoring</h5>
+                    <p class="text-muted">Track your energy usage live with second-by-second updates and beautiful charts</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 border-0 shadow-sm hover-lift" style="transition: transform 0.3s;">
+                    <div class="mb-3">
+                        <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex p-3">
+                            <i class="bi bi-robot text-success" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold">AI-Powered Predictions</h5>
+                    <p class="text-muted">Get accurate forecasts of your future consumption and billing using Machine Learning</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 border-0 shadow-sm hover-lift" style="transition: transform 0.3s;">
+                    <div class="mb-3">
+                        <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex p-3">
+                            <i class="bi bi-currency-rupee text-warning" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold">Bill Optimization</h5>
+                    <p class="text-muted">Reduce your electricity bills with smart recommendations and usage insights</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 border-0 shadow-sm hover-lift" style="transition: transform 0.3s;">
+                    <div class="mb-3">
+                        <div class="bg-danger bg-opacity-10 rounded-circle d-inline-flex p-3">
+                            <i class="bi bi-toggles2 text-danger" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold">IoT Device Control</h5>
+                    <p class="text-muted">Turn your devices ON/OFF remotely from anywhere using internet (Premium)</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 border-0 shadow-sm hover-lift" style="transition: transform 0.3s;">
+                    <div class="mb-3">
+                        <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex p-3">
+                            <i class="bi bi-bell-fill text-info" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold">Smart Alerts</h5>
+                    <p class="text-muted">Get instant notifications for voltage fluctuations, spikes, and unusual consumption</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4 border-0 shadow-sm hover-lift" style="transition: transform 0.3s;">
+                    <div class="mb-3">
+                        <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex p-3">
+                            <i class="bi bi-file-pdf-fill text-secondary" style="font-size: 2.5rem;"></i>
+                        </div>
+                    </div>
+                    <h5 class="fw-bold">Detailed Reports</h5>
+                    <p class="text-muted">Download comprehensive monthly reports with charts and analytics in PDF format</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Section -->
+<section class="py-5 bg-light" id="pricing">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Simple, Transparent Pricing</h2>
+            <p class="lead text-muted">Choose the plan that works best for you</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <!-- Free Plan -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow-sm" style="border-radius: 15px;">
+                    <div class="card-body p-4">
+                        <h3 class="card-title">🆓 Free Plan</h3>
+                        <p class="text-muted">Perfect for getting started</p>
+                        <h2 class="display-4 fw-bold">₹0<small class="text-muted fs-6">/forever</small></h2>
+                        <hr class="my-4">
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Real-time monitoring (7 days)</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> 1 device tracking</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Basic dashboard</li>
+                            <li class="mb-3 text-muted"><i class="bi bi-x-circle-fill"></i> No email notifications</li>
+                            <li class="mb-3 text-muted"><i class="bi bi-x-circle-fill"></i> No device control</li>
+                            <li class="mb-3 text-muted"><i class="bi bi-x-circle-fill"></i> No ML predictions</li>
+                        </ul>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-outline-primary w-100 py-2">Get Started Free</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Premium Monthly -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow-lg border-primary" style="border-radius: 15px; border-width: 3px; position: relative;">
+                    <div class="position-absolute top-0 start-50 translate-middle">
+                        <span class="badge bg-primary px-4 py-2" style="border-radius: 20px;">MOST POPULAR</span>
+                    </div>
+                    <div class="card-body p-4 mt-3">
+                        <h3 class="card-title">⭐ Premium Monthly</h3>
+                        <p class="text-muted">Full access to all features</p>
+                        <h2 class="display-4 fw-bold">₹99<small class="text-muted fs-6">/month</small></h2>
+                        <div class="alert alert-success small mb-3">
+                            <i class="bi bi-gift-fill"></i> <strong>1 MONTH FREE TRIAL!</strong>
+                        </div>
+                        <hr class="my-4">
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Everything in Free</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Unlimited devices & history</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> <strong>IoT Device Control</strong></li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Email & SMS alerts</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> ML predictions & reports</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Bill optimization tips</li>
+                        </ul>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-primary w-100 py-2">Start Free Trial</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Premium Yearly -->
+            <div class="col-lg-4">
+                <div class="card h-100 shadow-sm" style="border-radius: 15px;">
+                    <div class="card-body p-4">
+                        <h3 class="card-title">💎 Premium Yearly</h3>
+                        <p class="text-muted">Best value for money</p>
+                        <h2 class="display-4 fw-bold">₹999<small class="text-muted fs-6">/year</small></h2>
+                        <div class="alert alert-warning small mb-3">
+                            <i class="bi bi-piggy-bank-fill"></i> <strong>Save ₹189</strong> (2 months FREE!)
+                        </div>
+                        <hr class="my-4">
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Everything in Premium Monthly</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Advanced analytics</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Priority support</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> API access</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Custom reports</li>
+                            <li class="mb-3"><i class="bi bi-check-circle-fill text-success"></i> Export data</li>
+                        </ul>
+                        <a href="{{ url_for('auth.register') }}" class="btn btn-success w-100 py-2">Subscribe Yearly</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Support Section -->
+<section class="py-5" id="support">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="display-6 fw-bold mb-4">Need Help? We're Here!</h2>
+                <p class="lead mb-4">Have questions or need assistance? Our support team is ready to help you 24/7.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-3"><i class="bi bi-envelope-fill text-primary me-2"></i> Email: support@energytrack.app</li>
+                    <li class="mb-3"><i class="bi bi-telephone-fill text-success me-2"></i> Phone: +1-000-000-0000</li>
+                    <li class="mb-3"><i class="bi bi-clock-fill text-warning me-2"></i> Available: Mon-Sat, 9 AM - 6 PM</li>
+                </ul>
+            </div>
+            <div class="col-lg-6">
+                <div class="card shadow-sm p-4" style="border-radius: 15px;">
+                    <h4 class="mb-3">Send us a message</h4>
+                    <form action="/support/submit" method="POST">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="name" placeholder="Your Name" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="email" class="form-control" name="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="mb-3">
+                            <input type="text" class="form-control" name="subject" placeholder="Subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <textarea class="form-control" name="message" rows="4" placeholder="Your Message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+    <div class="container text-center">
+        <h2 class="display-5 fw-bold mb-4">Ready to Save Energy & Money?</h2>
+        <p class="lead mb-4">Join thousands of smart homeowners who are taking control of their energy consumption</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light btn-lg px-5" style="border-radius: 30px;">
+                <i class="bi bi-rocket-takeoff"></i> Start Your Free Trial
+            </a>
+            <a href="#pricing" class="btn btn-outline-light btn-lg px-5" style="border-radius: 30px;">
+                View Pricing
+            </a>
+        </div>
+        <p class="mt-4 text-white-50"><small>No credit card required • Cancel anytime • 30-day money-back guarantee</small></p>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-4 bg-dark text-white-50">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="text-white"><i class="bi bi-lightning-charge-fill"></i> EnergyTrack</h5>
+                <p>Smart Energy Monitoring System for Modern Homes</p>
+                <p class="mb-0">&copy; 2025 EnergyTrack. All rights reserved.</p>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-white">Quick Links</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#features" class="text-white-50 text-decoration-none">Features</a></li>
+                    <li><a href="#pricing" class="text-white-50 text-decoration-none">Pricing</a></li>
+                    <li><a href="#support" class="text-white-50 text-decoration-none">Support</a></li>
+                    <li><a href="{{ url_for('auth.login') }}" class="text-white-50 text-decoration-none">Login</a></li>
+                </ul>
+            </div>
+            <div class="col-md-3">
+                <h6 class="text-white">Contact</h6>
+                <p>Email: support@energytrack.app</p>
+                <p>Phone: +1-000-000-0000</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<style>
+.hover-lift:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+}
+</style>
+{% endblock %}

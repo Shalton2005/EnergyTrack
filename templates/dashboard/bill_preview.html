@@ -1,0 +1,202 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Bill Preview - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <!-- Header Actions -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="bi bi-receipt"></i> Electricity Bill Preview</h2>
+                <div>
+                    <a href="{{ url_for('dashboard.generate_bill') }}" class="btn btn-success" target="_blank">
+                        <i class="bi bi-download"></i> Download PDF
+                    </a>
+                    <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Back
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Bill Container -->
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
+                    <!-- Bill Header -->
+                    <div class="text-center mb-4 pb-3 border-bottom">
+                        <h3 class="text-primary mb-1">ELECTRICITY BILL</h3>
+                        <h5 class="text-muted">{{ bill.provider }}</h5>
+                        <p class="mb-0 small text-muted">Karnataka Electricity Board</p>
+                    </div>
+                    
+                    <!-- Consumer Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-primary mb-3">Consumer Details</h6>
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td><strong>Name:</strong></td>
+                                            <td>{{ bill.consumer_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Email:</strong></td>
+                                            <td>{{ bill.consumer_email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Phone:</strong></td>
+                                            <td>{{ bill.consumer_phone }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>RR Number:</strong></td>
+                                            <td><code>{{ bill.rr_number }}</code></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="text-primary mb-3">Billing Period</h6>
+                                    <table class="table table-sm table-borderless mb-0">
+                                        <tr>
+                                            <td><strong>Bill Date:</strong></td>
+                                            <td>{{ bill.bill_date }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Due Date:</strong></td>
+                                            <td class="text-danger">{{ bill.due_date }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Billing Period:</strong></td>
+                                            <td>{{ bill.billing_period }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Provider:</strong></td>
+                                            <td>{{ bill.provider }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Consumption Details -->
+                    <div class="card bg-info bg-opacity-10 mb-4">
+                        <div class="card-body">
+                            <h6 class="text-primary mb-3">Consumption Details</h6>
+                            <div class="row text-center">
+                                <div class="col-md-4">
+                                    <div class="p-3">
+                                        <h2 class="text-primary mb-1">{{ bill.units_consumed }}</h2>
+                                        <p class="text-muted mb-0">Units (kWh)</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3">
+                                        <h2 class="text-success mb-1">₹{{ "%.2f"|format(bill.total_amount) }}</h2>
+                                        <p class="text-muted mb-0">Total Amount</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="p-3">
+                                        <h2 class="text-warning mb-1">₹{{ "%.2f"|format(bill.units_consumed * 6.5) }}</h2>
+                                        <p class="text-muted mb-0">Avg. Rate</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Slab Breakdown -->
+                    {% if bill.slab_breakdown %}
+                    <div class="mb-4">
+                        <h6 class="text-primary mb-3">Slab-wise Breakdown</h6>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>Slab Range</th>
+                                        <th class="text-center">Units Used</th>
+                                        <th class="text-center">Rate (₹/kWh)</th>
+                                        <th class="text-end">Amount (₹)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for slab in bill.slab_breakdown %}
+                                    <tr>
+                                        <td>
+                                            {{ slab['from'] }} - {{ slab.up_to }} kWh
+                                        </td>
+                                        <td class="text-center"><strong>{{ slab.units }}</strong></td>
+                                        <td class="text-center">{{ "%.2f"|format(slab.rate) }}</td>
+                                        <td class="text-end"><strong>₹{{ "%.2f"|format(slab.charge) }}</strong></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Bill Summary -->
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0">Bill Summary</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm mb-0">
+                                <tr>
+                                    <td>Fixed Charges:</td>
+                                    <td class="text-end">₹{{ "%.2f"|format(bill.fixed_charge) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Energy Charges:</td>
+                                    <td class="text-end">₹{{ "%.2f"|format(bill.energy_charge) }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Electricity Duty (5%):</td>
+                                    <td class="text-end">₹{{ "%.2f"|format(bill.tax_amount) }}</td>
+                                </tr>
+                                <tr class="table-primary">
+                                    <td><strong>Total Amount Payable:</strong></td>
+                                    <td class="text-end"><h5 class="mb-0 text-primary">₹{{ "%.2f"|format(bill.total_amount) }}</h5></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Payment Info -->
+                    <div class="alert alert-warning mt-4">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        <strong>Due Date:</strong> {{ bill.due_date }} | 
+                        Late payment charges may apply after due date
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="text-muted small mb-1">
+                            This is a computer-generated bill for demonstration purposes
+                        </p>
+                        <p class="text-muted small mb-0">
+                            Generated by EnergyTrack - Smart Energy Management System
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="text-center mt-4">
+                <a href="{{ url_for('dashboard.generate_bill') }}" class="btn btn-success btn-lg" target="_blank">
+                    <i class="bi bi-file-pdf"></i> Download PDF Bill
+                </a>
+                <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-house-door"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Support Tickets - Admin Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4"><i class="bi bi-ticket"></i> Support Tickets</h2>
+    
+    <div class="mb-3">
+        <div class="btn-group">
+            <a href="?status=all" class="btn btn-{{ 'primary' if status_filter == 'all' else 'outline-primary' }}">All</a>
+            <a href="?status=open" class="btn btn-{{ 'primary' if status_filter == 'open' else 'outline-primary' }}">Open</a>
+            <a href="?status=closed" class="btn btn-{{ 'primary' if status_filter == 'closed' else 'outline-primary' }}">Closed</a>
+        </div>
+    </div>
+    
+    <div class="card shadow-sm">
+        <div class="card-header text-white" style="background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);">
+            <h5 class="mb-0"><i class="bi bi-ticket-detailed"></i> All Support Tickets</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                        <tr>
+                            <td>#{{ ticket.id }}</td>
+                            <td>{{ ticket.name }}</td>
+                            <td>{{ ticket.email }}</td>
+                            <td>{{ ticket.subject }}</td>
+                            <td><span class="badge bg-{{ 'success' if ticket.status == 'closed' else 'warning' }}">{{ ticket.status }}</span></td>
+                            <td><span class="badge bg-{{ 'danger' if ticket.priority == 'high' else 'secondary' }}">{{ ticket.priority }}</span></td>
+                            <td>{{ ticket.created_at.strftime('%b %d, %Y') }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#ticketModal{{ ticket.id }}">Reply</button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Modal for reply -->
+                        <div class="modal fade" id="ticketModal{{ ticket.id }}">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5>Reply to Ticket #{{ ticket.id }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('reply_ticket', ticket_id=ticket.id) }}">
+                                        <div class="modal-body">
+                                            <p><strong>From:</strong> {{ ticket.name }} ({{ ticket.email }})</p>
+                                            <p><strong>Message:</strong></p>
+                                            <p>{{ ticket.message }}</p>
+                                            <hr>
+                                            <div class="mb-3">
+                                                <label class="form-label">Your Reply</label>
+                                                <textarea class="form-control" name="reply" rows="4" required></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-primary">Send Reply & Close Ticket</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

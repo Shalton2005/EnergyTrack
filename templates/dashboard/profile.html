@@ -1,0 +1,197 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}My Profile - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-person-circle"></i> My Profile</h2>
+        <p class="text-muted">Manage your account information and settings</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Profile Overview -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow-sm text-center">
+            <div class="card-body">
+                <div class="mb-3">
+                    <i class="bi bi-person-circle text-primary" style="font-size: 6rem;"></i>
+                </div>
+                <h4>{{ current_user.name }}</h4>
+                <p class="text-muted mb-1">{{ current_user.email }}</p>
+                <span class="badge bg-{% if current_user.plan_type == 'FREE' %}secondary{% else %}success{% endif %} mb-3">
+                    {{ current_user.plan_type }}
+                </span>
+                <hr>
+                <div class="text-start">
+                    <p class="mb-1"><small class="text-muted">Member since</small></p>
+                    <p class="mb-3"><strong>{{ current_user.created_at.strftime('%d %B %Y') }}</strong></p>
+                    
+                    <p class="mb-1"><small class="text-muted">Account Status</small></p>
+                    <p>
+                        {% if current_user.is_verified %}
+                        <span class="badge bg-success"><i class="bi bi-check-circle"></i> Verified</span>
+                        {% else %}
+                        <span class="badge bg-warning"><i class="bi bi-clock"></i> Pending</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Update Forms -->
+    <div class="col-lg-8">
+        <!-- Update Basic Info -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-person-gear"></i> Basic Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="action" value="update_profile">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Full Name</strong></label>
+                            <input type="text" class="form-control" name="name" value="{{ current_user.name }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Phone Number</strong></label>
+                            <input type="tel" class="form-control" name="phone_number" value="{{ current_user.phone_number or '' }}" placeholder="+91 XXXXXXXXXX">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Electricity Provider</strong></label>
+                            <select class="form-select" name="electricity_provider">
+                                <option value="BESCOM" {% if current_user.electricity_provider == 'BESCOM' %}selected{% endif %}>BESCOM</option>
+                                <option value="MESCOM" {% if current_user.electricity_provider == 'MESCOM' %}selected{% endif %}>MESCOM</option>
+                                <option value="HESCOM" {% if current_user.electricity_provider == 'HESCOM' %}selected{% endif %}>HESCOM</option>
+                                <option value="GESCOM" {% if current_user.electricity_provider == 'GESCOM' %}selected{% endif %}>GESCOM</option>
+                                <option value="CESC" {% if current_user.electricity_provider == 'CESC' %}selected{% endif %}>CESC</option>
+                                <option value="OTHER" {% if current_user.electricity_provider == 'OTHER' %}selected{% endif %}>Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>RR Number</strong></label>
+                            <input type="text" class="form-control" name="rr_number" value="{{ current_user.rr_number or '' }}" placeholder="Your electricity RR number">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Update Email -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-envelope-at"></i> Email Address</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="action" value="update_email">
+                    <p class="text-muted">Current email: <strong>{{ current_user.email }}</strong></p>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>New Email Address</strong></label>
+                        <input type="email" class="form-control" name="new_email" placeholder="Enter new email address" required>
+                        <small class="text-muted">You'll need to verify the new email address</small>
+                    </div>
+                    <button type="submit" class="btn btn-info">
+                        <i class="bi bi-arrow-repeat"></i> Update Email
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Update Password -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Change Password</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <input type="hidden" name="action" value="update_password">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Current Password</strong></label>
+                        <input type="password" class="form-control" name="current_password" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>New Password</strong></label>
+                            <input type="password" class="form-control" name="new_password" minlength="6" required>
+                            <small class="text-muted">At least 6 characters</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label"><strong>Confirm New Password</strong></label>
+                            <input type="password" class="form-control" name="confirm_password" minlength="6" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="bi bi-key"></i> Change Password
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Delete Account -->
+        <div class="card shadow-sm border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="text-danger">Delete Account</h6>
+                <p class="text-muted">Once you delete your account, there is no going back. This will permanently delete:</p>
+                <ul class="text-muted">
+                    <li>Your profile and account information</li>
+                    <li>All consumption data and logs</li>
+                    <li>Payment history and transactions</li>
+                    <li>Support tickets and alerts</li>
+                </ul>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="bi bi-trash"></i> Delete My Account
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Confirmation Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle"></i> Confirm Account Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST">
+                <input type="hidden" name="action" value="delete_account">
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <strong>Warning!</strong> This action cannot be undone. All your data will be permanently deleted.
+                    </div>
+                    <p>Please enter your password to confirm account deletion:</p>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Password</strong></label>
+                        <input type="password" class="form-control" name="confirm_password" required>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="confirmDelete" required>
+                        <label class="form-check-label text-danger" for="confirmDelete">
+                            I understand that this action is permanent and irreversible
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Permanently Delete Account
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

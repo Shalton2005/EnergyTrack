@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Register - EnergyTrack{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <!-- Language Selector (Top Right) -->
+    <div class="position-absolute top-0 end-0 m-3">
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-translate"></i>
+                <span id="current-lang">English</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" onclick="changeLanguage('en'); return false;"><i class="bi bi-check-circle-fill text-success me-2" id="lang-en-check"></i>English</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeLanguage('hi'); return false;"><i class="bi bi-circle me-2" id="lang-hi-check"></i>हिन्दी (Hindi)</a></li>
+                <li><a class="dropdown-item" href="#" onclick="changeLanguage('kn'); return false;"><i class="bi bi-circle me-2" id="lang-kn-check"></i>ಕನ್ನಡ (Kannada)</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EnergyTrack Logo" class="auth-logo logo-animated" style="width: 100px; margin-bottom: 15px;">
+                            <h3 class="mt-2" data-translate="create_account">Create Account</h3>
+                            <p class="text-muted" data-translate="register_subtitle">Join EnergyTrack today</p>
+                        </div>
+                        
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <form method="POST" action="{{ url_for('auth.register') }}">
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="full_name">Full Name</label>
+                                <input type="text" class="form-control" name="name" placeholder="Your Full Name" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="email_address">Email Address</label>
+                                <input type="email" class="form-control" name="email" placeholder="your@email.com" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="phone_number">Phone Number</label>
+                                <input type="tel" class="form-control" name="phone" placeholder="9876543210" pattern="[0-9]{10}" required>
+                                <div class="form-text" data-translate="phone_hint">10-digit mobile number</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="electricity_provider">Electricity Provider</label>
+                                <select class="form-select" name="electricity_provider" required>
+                                    <option value="" data-translate="select_provider">Select Your Provider</option>
+                                    <option value="MESCOM">MESCOM (Mangalore Electricity Supply Company)</option>
+                                    <option value="BESCOM">BESCOM (Bangalore Electricity Supply Company)</option>
+                                    <option value="HESCOM">HESCOM (Hubli Electricity Supply Company)</option>
+                                    <option value="GESCOM">GESCOM (Gulbarga Electricity Supply Company)</option>
+                                    <option value="CESC">CESC (Chamundeshwari Electricity Supply Corp)</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="rr_number">RR/MR Number (Consumer Number)</label>
+                                <input type="text" class="form-control" name="rr_number" placeholder="e.g., RR12345678" required>
+                                <div class="form-text" data-translate="rr_hint">Your electricity bill consumer number</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="choose_plan">Choose Your Plan</label>
+                                <div class="form-check mb-2 p-3 border rounded" style="cursor: pointer;">
+                                    <input class="form-check-input" type="radio" name="plan_type" id="plan_free" value="FREE" checked>
+                                    <label class="form-check-label w-100" for="plan_free" style="cursor: pointer;">
+                                        <strong>🆓 <span data-translate="free_plan">Free Plan</span></strong>
+                                        <div class="text-muted small" data-translate="free_plan_desc">Basic monitoring (7 days data) • 1 device • No notifications</div>
+                                    </label>
+                                </div>
+                                <div class="form-check p-3 border rounded border-success" style="cursor: pointer; background-color: #f0fff4;">
+                                    <input class="form-check-input" type="radio" name="plan_type" id="plan_premium" value="PREMIUM_MONTHLY">
+                                    <label class="form-check-label w-100" for="plan_premium" style="cursor: pointer;">
+                                        <strong>⭐ <span data-translate="premium_plan">Premium Plan - ₹99/month</span></strong>
+                                        <div class="text-success small">
+                                            <strong data-translate="free_trial">1 MONTH FREE TRIAL!</strong> <span data-translate="then_price">Then ₹99/month</span>
+                                        </div>
+                                        <div class="text-muted small" data-translate="premium_desc">
+                                            Unlimited devices • IoT Control • Email/SMS alerts • ML Predictions • PDF Reports
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="password">Password</label>
+                                <input type="password" class="form-control" name="password" placeholder="Minimum 6 characters" required>
+                                <div class="form-text" data-translate="password_hint">Must be at least 6 characters long</div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label" data-translate="confirm_password">Confirm Password</label>
+                                <input type="password" class="form-control" name="confirm_password" placeholder="Re-enter password" required>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100 py-2 mb-3">
+                                <i class="bi bi-check-circle"></i> <span data-translate="create_account_btn">Create Account</span>
+                            </button>
+                            
+                            <hr>
+                            
+                            <div class="text-center">
+                                <p class="mb-0"><span data-translate="have_account">Already have an account?</span> <a href="{{ url_for('auth.login') }}" data-translate="login_here">Login here</a></p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                
+                <div class="text-center mt-3">
+                    <a href="/" class="text-white text-decoration-none">
+                        <i class="bi bi-arrow-left"></i> <span data-translate="back_to_home">Back to Home</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Language translations for register page
+    const translations = {
+        'en': {
+            'create_account': 'Create Account',
+            'register_subtitle': 'Join EnergyTrack today',
+            'full_name': 'Full Name',
+            'email_address': 'Email Address',
+            'phone_number': 'Phone Number',
+            'phone_hint': '10-digit mobile number',
+            'electricity_provider': 'Electricity Provider',
+            'select_provider': 'Select Your Provider',
+            'rr_number': 'RR/MR Number (Consumer Number)',
+            'rr_hint': 'Your electricity bill consumer number',
+            'choose_plan': 'Choose Your Plan',
+            'free_plan': 'Free Plan',
+            'free_plan_desc': 'Basic monitoring (7 days data) • 1 device • No notifications',
+            'premium_plan': 'Premium Plan - ₹99/month',
+            'free_trial': '1 MONTH FREE TRIAL!',
+            'then_price': 'Then ₹99/month',
+            'premium_desc': 'Unlimited devices • IoT Control • Email/SMS alerts • ML Predictions • PDF Reports',
+            'password': 'Password',
+            'password_hint': 'Must be at least 6 characters long',
+            'confirm_password': 'Confirm Password',
+            'create_account_btn': 'Create Account',
+            'have_account': 'Already have an account?',
+            'login_here': 'Login here',
+            'back_to_home': 'Back to Home'
+        },
+        'hi': {
+            'create_account': 'खाता बनाएं',
+            'register_subtitle': 'आज ही EnergyTrack से जुड़ें',
+            'full_name': 'पूरा नाम',
+            'email_address': 'ईमेल पता',
+            'phone_number': 'फोन नंबर',
+            'phone_hint': '10 अंकों का मोबाइल नंबर',
+            'electricity_provider': 'बिजली प्रदाता',
+            'select_provider': 'अपना प्रदाता चुनें',
+            'rr_number': 'RR/MR नंबर (उपभोक्ता संख्या)',
+            'rr_hint': 'आपके बिजली बिल की उपभोक्ता संख्या',
+            'choose_plan': 'अपनी योजना चुनें',
+            'free_plan': 'मुफ्त योजना',
+            'free_plan_desc': 'बुनियादी निगरानी (7 दिन डेटा) • 1 उपकरण • कोई अधिसूचना नहीं',
+            'premium_plan': 'प्रीमियम योजना - ₹99/महीना',
+            'free_trial': '1 महीने का मुफ्त ट्रायल!',
+            'then_price': 'फिर ₹99/महीना',
+            'premium_desc': 'असीमित उपकरण • IoT नियंत्रण • ईमेल/SMS अलर्ट • ML भविष्यवाणी • PDF रिपोर्ट',
+            'password': 'पासवर्ड',
+            'password_hint': 'कम से कम 6 वर्ण लंबा होना चाहिए',
+            'confirm_password': 'पासवर्ड की पुष्टि करें',
+            'create_account_btn': 'खाता बनाएं',
+            'have_account': 'पहले से खाता है?',
+            'login_here': 'यहाँ लॉगिन करें',
+            'back_to_home': 'होम पर वापस जाएं'
+        },
+        'kn': {
+            'create_account': 'ಖಾತೆ ರಚಿಸಿ',
+            'register_subtitle': 'ಇಂದೇ EnergyTrack ಸೇರಿ',
+            'full_name': 'ಪೂರ್ಣ ಹೆಸರು',
+            'email_address': 'ಇಮೇಲ್ ವಿಳಾಸ',
+            'phone_number': 'ಫೋನ್ ಸಂಖ್ಯೆ',
+            'phone_hint': '10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ',
+            'electricity_provider': 'ವಿದ್ಯುತ್ ಪೂರೈಕೆದಾರ',
+            'select_provider': 'ನಿಮ್ಮ ಪೂರೈಕೆದಾರ ಆಯ್ಕೆಮಾಡಿ',
+            'rr_number': 'RR/MR ಸಂಖ್ಯೆ (ಗ್ರಾಹಕ ಸಂಖ್ಯೆ)',
+            'rr_hint': 'ನಿಮ್ಮ ವಿದ್ಯುತ್ ಬಿಲ್ ಗ್ರಾಹಕ ಸಂಖ್ಯೆ',
+            'choose_plan': 'ನಿಮ್ಮ ಯೋಜನೆ ಆಯ್ಕೆಮಾಡಿ',
+            'free_plan': 'ಉಚಿತ ಯೋಜನೆ',
+            'free_plan_desc': 'ಮೂಲಭೂತ ಮೇಲ್ವಿಚಾರಣೆ (7 ದಿನಗಳ ಡೇಟಾ) • 1 ಸಾಧನ • ಅಧಿಸೂಚನೆಗಳಿಲ್ಲ',
+            'premium_plan': 'ಪ್ರೀಮಿಯಂ ಯೋಜನೆ - ₹99/ತಿಂಗಳು',
+            'free_trial': '1 ತಿಂಗಳ ಉಚಿತ ಪ್ರಯೋಗ!',
+            'then_price': 'ನಂತರ ₹99/ತಿಂಗಳು',
+            'premium_desc': 'ಅನಿಯಮಿತ ಸಾಧನಗಳು • IoT ನಿಯಂತ್ರಣ • ಇಮೇಲ್/SMS ಎಚ್ಚರಿಕೆಗಳು • ML ಮುನ್ಸೂಚನೆಗಳು • PDF ವರದಿಗಳು',
+            'password': 'ಪಾಸ್‌ವರ್ಡ್',
+            'password_hint': 'ಕನಿಷ್ಠ 6 ಅಕ್ಷರಗಳು ಉದ್ದವಿರಬೇಕು',
+            'confirm_password': 'ಪಾಸ್‌ವರ್ಡ್ ದೃಢೀಕರಿಸಿ',
+            'create_account_btn': 'ಖಾತೆ ರಚಿಸಿ',
+            'have_account': 'ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?',
+            'login_here': 'ಇಲ್ಲಿ ಲಾಗಿನ್ ಮಾಡಿ',
+            'back_to_home': 'ಮುಖಪುಟಕ್ಕೆ ಹಿಂತಿರುಗಿ'
+        }
+    };
+    
+    function changeLanguage(lang) {
+        localStorage.setItem('preferredLanguage', lang);
+        
+        // Update check marks
+        ['en', 'hi', 'kn'].forEach(l => {
+            const check = document.getElementById(`lang-${l}-check`);
+            if (check) {
+                check.className = l === lang ? 'bi bi-check-circle-fill text-success me-2' : 'bi bi-circle me-2';
+            }
+        });
+        
+        // Update current language display
+        const langNames = {'en': 'English', 'hi': 'हिन्दी', 'kn': 'ಕನ್ನಡ'};
+        const currentLangEl = document.getElementById('current-lang');
+        if (currentLangEl) {
+            currentLangEl.textContent = langNames[lang];
+        }
+        
+        // Apply translations to elements with data-translate attribute
+        document.querySelectorAll('[data-translate]').forEach(el => {
+            const key = el.getAttribute('data-translate');
+            if (translations[lang] && translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+    }
+    
+    // Load saved language on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLang = localStorage.getItem('preferredLanguage') || 'en';
+        changeLanguage(savedLang);
+    });
+</script>
+{% endblock %}
+

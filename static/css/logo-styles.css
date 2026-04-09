@@ -1,0 +1,76 @@
+/* Custom styles for EnergyTrack Logo */
+
+/* Logo hover effect */
+.navbar-brand img,
+.sidebar img {
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+/* Logo animation on page load */
+@keyframes logoFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.logo-animated {
+    animation: logoFadeIn 0.6s ease-out;
+}
+
+/* Sidebar logo specific styling */
+.sidebar img {
+    border-radius: 12px;
+    padding: 5px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Favicon optimization */
+link[rel="icon"] {
+    border-radius: 4px;
+}
+
+/* Logo on auth pages */
+.auth-logo {
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+    .navbar-brand img {
+        height: 40px !important;
+    }
+    
+    .sidebar img {
+        width: 80px !important;
+    }
+}
+
+/* Dark mode logo adjustments */
+[data-bs-theme="dark"] .sidebar img {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Pulse animation for logo (optional) */
+@keyframes logoPulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+.logo-pulse {
+    animation: logoPulse 3s ease-in-out infinite;
+}

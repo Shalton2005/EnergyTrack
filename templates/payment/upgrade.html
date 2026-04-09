@@ -1,0 +1,102 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Upgrade Plan - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4"><i class="bi bi-rocket-takeoff"></i> Upgrade Your Plan</h2>
+    
+    <div class="row g-4">
+        <!-- Current Plan -->
+        <div class="col-12">
+            <div class="alert alert-info">
+                <strong>Current Plan:</strong> {{ current_user.plan_type }}
+                {% if current_user.trial_days_remaining() > 0 %}
+                <span class="badge bg-warning ms-2">{{ current_user.trial_days_remaining() }} days trial remaining</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Premium Monthly -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow {% if current_user.plan_type == 'PREMIUM_MONTHLY' %}border-primary{% endif %}">
+                <div class="card-body p-4">
+                    <h3 class="card-title">⭐ Premium Monthly</h3>
+                    <h2 class="display-4 text-primary">₹99<small class="fs-6 text-muted">/month</small></h2>
+                    <hr>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Unlimited devices & history</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> IoT Device Control</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Email & SMS alerts</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> ML predictions</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> PDF reports</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Bill optimization</li>
+                    </ul>
+                    
+                    {% if current_user.plan_type == 'PREMIUM_MONTHLY' %}
+                    <button class="btn btn-secondary w-100" disabled>Current Plan</button>
+                    {% else %}
+                    <a href="{{ url_for('payment.checkout', plan_type='PREMIUM_MONTHLY') }}" class="btn btn-primary w-100">
+                        Upgrade Now
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Premium Yearly -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow border-success {% if current_user.plan_type == 'PREMIUM_YEARLY' %}border-3{% endif %}">
+                <div class="position-absolute top-0 start-50 translate-middle">
+                    <span class="badge bg-success px-3 py-2">BEST VALUE</span>
+                </div>
+                <div class="card-body p-4 mt-3">
+                    <h3 class="card-title">💎 Premium Yearly</h3>
+                    <h2 class="display-4 text-success">₹999<small class="fs-6 text-muted">/year</small></h2>
+                    <div class="alert alert-warning small mb-3">
+                        <i class="bi bi-piggy-bank"></i> <strong>Save ₹189</strong> (2 months FREE!)
+                    </div>
+                    <hr>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Everything in Monthly</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Advanced analytics</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Priority support</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> API access</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Custom reports</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success"></i> Data export</li>
+                    </ul>
+                    
+                    {% if current_user.plan_type == 'PREMIUM_YEARLY' %}
+                    <button class="btn btn-secondary w-100" disabled>Current Plan</button>
+                    {% else %}
+                    <a href="{{ url_for('payment.checkout', plan_type='PREMIUM_YEARLY') }}" class="btn btn-success w-100">
+                        Upgrade Now
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payment History -->
+    <div class="mt-5">
+        <h4>Payment History</h4>
+        <a href="{{ url_for('payment.history') }}" class="btn btn-outline-primary">View All Payments</a>
+    </div>
+    
+    <!-- Cancel Subscription -->
+    {% if current_user.plan_type != 'FREE' %}
+    <div class="mt-4">
+        <div class="card border-danger">
+            <div class="card-body">
+                <h5 class="text-danger">Cancel Subscription</h5>
+                <p class="text-muted">Downgrade to FREE plan and lose access to premium features</p>
+                <form method="POST" action="{{ url_for('payment.cancel_subscription') }}" onsubmit="return confirm('Are you sure you want to cancel your subscription?')">
+                    <button type="submit" class="btn btn-outline-danger">Cancel Subscription</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

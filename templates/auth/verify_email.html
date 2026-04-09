@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Verify Email - EnergyTrack{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-envelope-check-fill text-info" style="font-size: 3rem;"></i>
+                            <h3 class="mt-2">Verify Your Email</h3>
+                            <p class="text-muted">We've sent a 6-digit OTP to<br><strong>{{ email }}</strong></p>
+                        </div>
+                        
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <form method="POST" action="{{ url_for('auth.verify_email') }}">
+                            <div class="mb-4">
+                                <label class="form-label">Enter OTP Code</label>
+                                <input type="text" class="form-control form-control-lg text-center" name="otp" 
+                                       placeholder="000000" maxlength="6" required style="letter-spacing: 10px; font-size: 1.5rem;">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                                <i class="bi bi-check-circle"></i> Verify Email
+                            </button>
+                        </form>
+                        
+                        <div class="text-center text-muted">
+                            <small>OTP expires in 10 minutes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

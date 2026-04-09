@@ -1,0 +1,187 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Device Identification - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2><i class="bi bi-plugin"></i> Device Identification (Prototype)</h2>
+        <p class="text-muted">AI-powered appliance detection based on consumption patterns</p>
+    </div>
+</div>
+
+<!-- Active Devices -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Currently Active Devices</h5>
+                
+                {% if devices %}
+                <div class="row">
+                    {% for device in devices %}
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <i class="bi bi-plug-fill text-primary" style="font-size: 2.5rem;"></i>
+                                <h5 class="mt-3">{{ device.device }}</h5>
+                                <h3 class="text-primary">{{ device.estimated_power }} kW</h3>
+                                <span class="badge bg-{{ 'success' if device.confidence == 'high' else ('warning' if device.confidence == 'medium' else 'secondary') }}">
+                                    {{ device.confidence|upper }} confidence
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i> No devices currently detected. Make sure appliances are running.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Device Library -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Detectable Devices</h5>
+                <p class="text-muted">This system can identify the following appliances based on power consumption patterns</p>
+                
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-snow2 text-info" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Refrigerator</h6>
+                                <small class="text-muted">0.1 - 0.3 kW</small><br>
+                                <span class="badge bg-secondary">Cyclic Pattern</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-droplet-fill text-danger" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Water Heater/Geyser</h6>
+                                <small class="text-muted">1.5 - 3.0 kW</small><br>
+                                <span class="badge bg-secondary">Constant Load</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-fan text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Air Conditioner</h6>
+                                <small class="text-muted">1.0 - 2.5 kW</small><br>
+                                <span class="badge bg-secondary">Constant Load</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightning-fill text-warning" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Iron Box</h6>
+                                <small class="text-muted">0.8 - 1.5 kW</small><br>
+                                <span class="badge bg-secondary">Spike Pattern</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-cup-hot-fill text-success" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Electric Kettle</h6>
+                                <small class="text-muted">1.2 - 2.0 kW</small><br>
+                                <span class="badge bg-secondary">Spike Pattern</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-circle-fill text-info" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Washing Machine</h6>
+                                <small class="text-muted">0.5 - 1.2 kW</small><br>
+                                <span class="badge bg-secondary">Cyclic Pattern</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-lightbulb-fill text-warning" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">Lights & Fans</h6>
+                                <small class="text-muted">0.05 - 0.3 kW</small><br>
+                                <span class="badge bg-secondary">Constant Load</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="bi bi-tv-fill text-primary" style="font-size: 2rem;"></i>
+                                <h6 class="mt-2">TV & Electronics</h6>
+                                <small class="text-muted">0.1 - 0.4 kW</small><br>
+                                <span class="badge bg-secondary">Constant Load</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- How it Works -->
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">How Device Identification Works</h5>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center p-3">
+                            <i class="bi bi-graph-up text-primary" style="font-size: 2.5rem;"></i>
+                            <h6 class="mt-2">Pattern Analysis</h6>
+                            <p class="text-muted small">Analyzes power consumption patterns from sub-meters</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3">
+                            <i class="bi bi-cpu text-success" style="font-size: 2.5rem;"></i>
+                            <h6 class="mt-2">NILM Algorithm</h6>
+                            <p class="text-muted small">Non-Intrusive Load Monitoring identifies devices</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center p-3">
+                            <i class="bi bi-check-circle text-info" style="font-size: 2.5rem;"></i>
+                            <h6 class="mt-2">Real-time Detection</h6>
+                            <p class="text-muted small">Updates automatically as devices turn on/off</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>Note:</strong> This is a prototype feature. Device identification accuracy improves over time as the system learns your usage patterns.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

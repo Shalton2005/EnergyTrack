@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - EnergyTrack</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <!-- Logo Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/logo-styles.css') }}">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .card {
+            border-radius: 15px;
+            border: none;
+        }
+        
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-right: none;
+        }
+        
+        .form-control {
+            border-left: none;
+        }
+        
+        .form-control:focus {
+            box-shadow: none;
+            border-color: #ced4da;
+        }
+        
+        .input-group:focus-within .input-group-text {
+            border-color: #667eea;
+            color: #667eea;
+        }
+        
+        .input-group:focus-within .form-control {
+            border-color: #667eea;
+        }
+        
+        .auth-logo {
+            width: 100px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="min-vh-100 d-flex align-items-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="EnergyTrack Logo" class="auth-logo logo-animated">
+                            <h3 class="mt-2"><i class="bi bi-shield-lock-fill text-danger"></i> Admin Portal</h3>
+                            <p class="text-muted">Secure Administrator Access</p>
+                        </div>
+                        
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <form method="POST" action="{{ url_for('admin_login') }}">
+                            <div class="mb-3">
+                                <label class="form-label">Admin Email</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                    <input type="email" class="form-control" name="email" placeholder="admin@example.com" required autofocus>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Admin Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                    <input type="password" class="form-control" name="password" placeholder="Enter admin password" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" name="remember" id="remember">
+                                <label class="form-check-label" for="remember">Keep me logged in</label>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                                <i class="bi bi-shield-check"></i> Admin Login
+                            </button>
+                            
+                            <hr>
+                            
+                            <div class="text-center">
+                                <p class="mb-0 text-muted small">
+                                    <i class="bi bi-info-circle"></i> Admin Portal - Port 5001
+                                </p>
+                                <a href="http://127.0.0.1:5000" class="text-decoration-none small">
+                                    <i class="bi bi-arrow-left"></i> User Application
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-3">
+                    <p class="text-white small opacity-75">
+                        <i class="bi bi-shield-fill-check"></i> Secure Admin Access | EnergyTrack System
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

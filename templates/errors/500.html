@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}500 - Server Error{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+    <div class="container text-center text-white">
+        <h1 class="display-1 fw-bold">500</h1>
+        <h2 class="mb-4">Internal Server Error</h2>
+        <p class="lead mb-4">Something went wrong on our end. Please try again later.</p>
+        <a href="/" class="btn btn-light btn-lg">
+            <i class="bi bi-house-fill"></i> Go Home
+        </a>
+    </div>
+</div>
+{% endblock %}

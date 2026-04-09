@@ -1,0 +1,136 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}My Devices - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2><i class="bi bi-toggles2"></i> IoT Device Control</h2>
+            <p class="text-muted">Manage and control your smart devices remotely</p>
+        </div>
+        <a href="{{ url_for('devices.add_device') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Device
+        </a>
+    </div>
+
+    {% if not devices %}
+    <div class="card text-center py-5">
+        <div class="card-body">
+            <i class="bi bi-plug text-muted" style="font-size: 5rem;"></i>
+            <h4 class="mt-3">No Devices Added Yet</h4>
+            <p class="text-muted">Add your first IoT device to start controlling it remotely</p>
+            <a href="{{ url_for('devices.add_device') }}" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-circle"></i> Add First Device
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="row g-4">
+        {% for device in devices %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 {% if device.is_on %}border-success{% endif %}" style="transition: all 0.3s;">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                {% if device.device_type == 'light' %}<i class="bi bi-lightbulb-fill text-warning"></i>
+                                {% elif device.device_type == 'fan' %}<i class="bi bi-fan text-info"></i>
+                                {% elif device.device_type == 'ac' %}<i class="bi bi-snow2 text-primary"></i>
+                                {% elif device.device_type == 'heater' %}<i class="bi bi-thermometer-sun text-danger"></i>
+                                {% else %}<i class="bi bi-plug text-secondary"></i>
+                                {% endif %}
+                                {{ device.device_name }}
+                            </h5>
+                            <small class="text-muted">{{ device.room|title if device.room else 'No room' }}</small>
+                        </div>
+                        <span class="badge {% if device.is_online %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ 'Online' if device.is_online else 'Offline' }}
+                        </span>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted">Power Rating:</small>
+                        <div><strong>{{ device.power_rating }}W</strong></div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-{{ 'success' if device.is_on else 'outline-secondary' }} toggle-btn" 
+                                data-device-id="{{ device.id }}"
+                                {% if not device.is_online %}disabled{% endif %}>
+                            <i class="bi bi-power"></i> 
+                            <span class="status-text">{{ 'ON' if device.is_on else 'OFF' }}</span>
+                        </button>
+                        <div class="btn-group">
+                            <form action="{{ url_for('devices.delete_device', device_id=device.id) }}" method="POST" style="display: inline;">
+                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this device?')">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    {% if device.last_toggled_at %}
+                    <small class="text-muted d-block mt-2">
+                        Last toggled: {{ device.last_toggled_at.strftime('%b %d, %I:%M %p') }}
+                    </small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', async function() {
+        const deviceId = this.dataset.deviceId;
+        const statusText = this.querySelector('.status-text');
+        const card = this.closest('.card');
+        
+        try {
+            const response = await fetch(`/devices/toggle/${deviceId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update UI
+                if (data.is_on) {
+                    this.classList.remove('btn-outline-secondary');
+                    this.classList.add('btn-success');
+                    card.classList.add('border-success');
+                    statusText.textContent = 'ON';
+                } else {
+                    this.classList.remove('btn-success');
+                    this.classList.add('btn-outline-secondary');
+                    card.classList.remove('border-success');
+                    statusText.textContent = 'OFF';
+                }
+                
+                // Show toast notification
+                showToast(data.message, 'success');
+            }
+        } catch (error) {
+            console.error('Error toggling device:', error);
+            showToast('Failed to toggle device', 'danger');
+        }
+    });
+});
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `alert alert-${type} position-fixed top-0 end-0 m-3`;
+    toast.style.zIndex = '9999';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+}
+</script>
+{% endblock %}

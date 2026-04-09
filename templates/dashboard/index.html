@@ -1,0 +1,574 @@
+{% extends "dashboard_base.html" %}
+
+{% block title %}Dashboard - EnergyTrack{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>
+            <span class="live-indicator"></span>
+            Real-Time Energy Dashboard
+        </h2>
+        <p class="text-muted">Live monitoring of your energy consumption</p>
+    </div>
+    <div class="col-auto">
+        <a href="{{ url_for('download_report') }}" class="btn btn-primary">
+            <i class="bi bi-download"></i> Download Report (PDF)
+        </a>
+    </div>
+</div>
+
+<!-- Live Statistics -->
+<div class="row g-3 mb-4">
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card primary shadow-sm">
+            <h6 class="mb-2"><i class="bi bi-lightning-fill"></i> <span data-translate="current_power">Current Power</span></h6>
+            <h2 class="mb-0" id="current-power">0.00</h2>
+            <small data-translate="kW">kW</small>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card success shadow-sm">
+            <h6 class="mb-2"><i class="bi bi-plug"></i> <span data-translate="voltage">Voltage</span></h6>
+            <h2 class="mb-0" id="current-voltage">0.0</h2>
+            <small data-translate="V">V</small>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card warning shadow-sm">
+            <h6 class="mb-2"><i class="bi bi-calendar-day"></i> <span data-translate="today_usage">Today's Usage</span></h6>
+            <h2 class="mb-0" id="today-consumption">0.00</h2>
+            <small data-translate="kWh">kWh</small>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="stat-card danger shadow-sm">
+            <h6 class="mb-2"><i class="bi bi-calendar-month"></i> <span data-translate="monthly_estimate">Monthly Estimate</span></h6>
+            <h2 class="mb-0" id="monthly-estimate">0.00</h2>
+            <small data-translate="kWh">kWh</small>
+        </div>
+    </div>
+</div>
+
+<!-- Sub-meter Readings -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-speedometer2"></i> <span data-translate="sub_meter_readings">Sub-Meter Readings</span></h5>
+                <div class="row text-center mt-3">
+                    <div class="col-lg-4 col-md-4 mb-3 mb-lg-0">
+                        <h6 class="text-muted" data-translate="kitchen_laundry">Kitchen & Laundry</h6>
+                        <h3 class="text-primary mb-0" id="sub-meter-1">0.0</h3>
+                        <small class="text-muted" data-translate="Wh">Wh</small>
+                    </div>
+                    <div class="col-lg-4 col-md-4 mb-3 mb-lg-0">
+                        <h6 class="text-muted" data-translate="water_heater_ac">Water Heater & AC</h6>
+                        <h3 class="text-success mb-0" id="sub-meter-2">0.0</h3>
+                        <small class="text-muted" data-translate="Wh">Wh</small>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <h6 class="text-muted" data-translate="electric_heater_washer">Electric Heater & Washer</h6>
+                        <h3 class="text-warning mb-0" id="sub-meter-3">0.0</h3>
+                        <small class="text-muted" data-translate="Wh">Wh</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AI Appliance Detection (UNIQUE FEATURE!) -->
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-primary">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-robot"></i> <span data-translate="ai_detection">AI-Powered Appliance Detection</span>
+                    <span class="badge bg-success ms-2">LIVE</span>
+                </h5>
+                <p class="text-muted mb-3" data-translate="ai_detection_desc">Identifying running appliances using machine learning</p>
+                <div id="detected-appliances" class="row">
+                    <div class="col-12 text-center text-muted">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Analyzing power patterns...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cost Comparison Widget -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-info">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="bi bi-bar-chart-fill"></i> <span data-translate="you_vs_average">You vs Average</span>
+                </h5>
+                <p class="text-muted mb-3" data-translate="compare_households">Compare with typical households</p>
+                
+                <div class="text-center mb-3">
+                    <div class="position-relative d-inline-block">
+                        <svg width="120" height="120">
+                            <circle cx="60" cy="60" r="50" fill="none" stroke="#e9ecef" stroke-width="10"/>
+                            <circle id="comparison-circle" cx="60" cy="60" r="50" fill="none" stroke="#28a745" stroke-width="10"
+                                    stroke-dasharray="314" stroke-dashoffset="157" 
+                                    transform="rotate(-90 60 60)" stroke-linecap="round"/>
+                        </svg>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <h3 class="mb-0 text-success" id="comparison-percent">0%</h3>
+                            <small class="text-muted">less</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="small">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted" data-translate="your_usage">Your usage:</span>
+                        <strong id="user-usage">0 kWh</strong>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted" data-translate="avg_household">Avg household:</span>
+                        <strong id="avg-usage">250 kWh</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted" data-translate="savings">Savings:</span>
+                        <strong class="text-success" id="savings-amount">₹0</strong>
+                    </div>
+                </div>
+                
+                <div class="alert alert-success alert-permanent py-2 mt-3 mb-0">
+                    <small><i class="bi bi-trophy-fill"></i> <strong id="rank-text">Great job!</strong> You're in the top <strong id="percentile">25%</strong> of efficient users.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts -->
+<div class="row">
+    <div class="col-lg-8 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-graph-up"></i> Live Power Consumption</h5>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="liveChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-lightning-charge"></i> Voltage Monitor</h5>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="voltageChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Daily Consumption Chart -->
+<div class="row">
+    <div class="col-lg-8 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-bar-chart-line"></i> Daily Consumption (Last 7 Days)</h5>
+                <div style="height: 250px; position: relative;">
+                    <canvas id="dailyChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Energy Saving Tips -->
+    <div class="col-lg-4 mb-3">
+        <div class="card shadow-sm border-success">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-lightbulb"></i> <span data-translate="smart_tips">Smart Tips</span></h5>
+                <div class="alert alert-success alert-permanent mb-2 py-2">
+                    <small><strong>💡 AC Usage:</strong> Set to 24°C to save ₹300-500/month</small>
+                </div>
+                <div class="alert alert-info alert-permanent mb-2 py-2">
+                    <small><strong>🌙 Off-Peak Hours:</strong> Run washing machine after 10 PM for lower rates</small>
+                </div>
+                <div class="alert alert-warning alert-permanent mb-2 py-2">
+                    <small><strong>⚡ Standby Power:</strong> Unplug chargers when not in use</small>
+                </div>
+                <div class="text-center mt-3">
+                    <small class="text-muted">Potential savings: <strong class="text-success">₹500-800/month</strong></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Alerts - REMOVED FROM BOTTOM, NOW IN NAVBAR -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Chart configurations
+    let liveChart, voltageChart, dailyChart;
+    let liveData = { labels: [], power: [], voltage: [] };
+    
+    // Initialize charts
+    function initCharts() {
+        console.log('Initializing charts...');
+        
+        // Live power chart (hourly - last 24 points)
+        const liveCtx = document.getElementById('liveChart');
+        if (!liveCtx) {
+            console.error('liveChart canvas not found');
+            return;
+        }
+        liveChart = new Chart(liveCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Power (kW)',
+                    data: [],
+                    borderColor: 'rgb(52, 152, 219)',
+                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                animation: {
+                    duration: 500
+                }
+            }
+        });
+        
+        // Voltage chart
+        const voltageCtx = document.getElementById('voltageChart');
+        if (!voltageCtx) {
+            console.error('voltageChart canvas not found');
+            return;
+        }
+        voltageChart = new Chart(voltageCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Voltage (V)',
+                    data: [],
+                    borderColor: 'rgb(39, 174, 96)',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        min: 200,
+                        max: 250
+                    }
+                }
+            }
+        });
+        
+        // Daily consumption chart
+        const dailyCtx = document.getElementById('dailyChart');
+        if (!dailyCtx) {
+            console.error('dailyChart canvas not found');
+            return;
+        }
+        dailyChart = new Chart(dailyCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Consumption (kWh)',
+                    data: [],
+                    backgroundColor: 'rgba(243, 156, 18, 0.8)',
+                    borderColor: 'rgb(243, 156, 18)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        
+        console.log('Charts initialized');
+        
+        // Load daily data
+        loadDailyData();
+        
+        // Load initial live chart data (last 24 points)
+        loadLiveChartData();
+    }
+    
+    // Load initial live chart data
+    function loadLiveChartData() {
+        console.log('Loading initial chart data...');
+        fetch('/dashboard/api/chart-data/live')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Received chart data:', data);
+                if (data.labels && data.power && data.voltage) {
+                    liveChart.data.labels = data.labels;
+                    liveChart.data.datasets[0].data = data.power;
+                    liveChart.update();
+                    
+                    voltageChart.data.labels = data.labels;
+                    voltageChart.data.datasets[0].data = data.voltage;
+                    voltageChart.update();
+                    console.log('Charts updated successfully');
+                } else {
+                    console.error('Invalid data format received:', data);
+                }
+            })
+            .catch(error => console.error('Error loading live chart data:', error));
+    }
+    
+    // Update live data
+    function updateLiveData() {
+        fetch('/dashboard/api/live-data')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Live data update:', data);
+                // Update stat cards with proper numerical formatting
+                document.getElementById('current-power').textContent = data.current_power.toFixed(3);
+                document.getElementById('current-voltage').textContent = data.voltage.toFixed(1);
+                document.getElementById('today-consumption').textContent = data.today_consumption.toFixed(2);
+                document.getElementById('monthly-estimate').textContent = data.monthly_estimate.toFixed(2);
+                
+                // Update sub-meters (display in Wh - Watt-hours)
+                document.getElementById('sub-meter-1').textContent = data.sub_metering1.toFixed(1);
+                document.getElementById('sub-meter-2').textContent = data.sub_metering2.toFixed(1);
+                document.getElementById('sub-meter-3').textContent = data.sub_metering3.toFixed(1);
+                
+                // Update alerts in navbar
+                if (data.alert_count > 0) {
+                    document.getElementById('alert-badge').textContent = data.alert_count;
+                    const alertsMenu = document.getElementById('alerts-menu');
+                    let alertsHTML = '<li><h6 class=\"dropdown-header\">Recent Alerts</h6></li><li><hr class=\"dropdown-divider\"></li>';
+                    data.alerts.forEach(alert => {
+                        const severityClass = alert.severity === 'danger' ? 'text-danger' : alert.severity === 'warning' ? 'text-warning' : 'text-info';
+                        alertsHTML += `<li><a class=\"dropdown-item ${severityClass}\" href=\"/dashboard/alerts\"><i class=\"bi bi-exclamation-triangle\"></i> ${alert.message}<br><small class=\"text-muted\">${alert.created_at}</small></a></li>`;
+                    });
+                    alertsMenu.innerHTML = alertsHTML;
+                } else {
+                    document.getElementById('alert-badge').textContent = '0';
+                }
+                
+                // Update charts - show hourly data (last 24 data points)
+                const time = new Date(data.timestamp).toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'});
+                
+                // Add to live chart (keep last 24 points for hourly view)
+                liveChart.data.labels.push(time);
+                liveChart.data.datasets[0].data.push(data.current_power);
+                
+                if (liveChart.data.labels.length > 24) {
+                    liveChart.data.labels.shift();
+                    liveChart.data.datasets[0].data.shift();
+                }
+                liveChart.update('none'); // Update without animation for smoothness
+                
+                // Add to voltage chart
+                voltageChart.data.labels.push(time);
+                voltageChart.data.datasets[0].data.push(data.voltage);
+                
+                if (voltageChart.data.labels.length > 24) {
+                    voltageChart.data.labels.shift();
+                    voltageChart.data.datasets[0].data.shift();
+                }
+                voltageChart.update('none');
+                
+                // Update AI Appliance Detection
+                updateDetectedAppliances(data.detected_appliances || []);
+                
+                // Update Cost Comparison Widget
+                updateCostComparison(data.monthly_estimate, data.today_consumption);
+                
+                // DON'T update Smart Tips here - they should stay static after initial load
+                
+                // Voltage monitoring (alerts handled by backend)
+            })
+            .catch(error => console.error('Error fetching live data:', error));
+    }
+    
+    // Update detected appliances display
+    function updateDetectedAppliances(appliances) {
+        const container = document.getElementById('detected-appliances');
+        
+        if (!appliances || appliances.length === 0) {
+            container.innerHTML = `
+                <div class="col-12 text-center text-muted">
+                    <i class="bi bi-info-circle"></i> No appliances detected. 
+                    <small>AI needs more data patterns...</small>
+                </div>`;
+            return;
+        }
+        
+        let html = '';
+        appliances.forEach((app, index) => {
+            const icon = getApplianceIcon(app.name);
+            const badgeColor = app.confidence >= 80 ? 'success' : app.confidence >= 60 ? 'warning' : 'secondary';
+            
+            html += `
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <div class="card h-100 border-${badgeColor}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-${icon}"></i> ${app.name}
+                                </h5>
+                                <span class="badge bg-${badgeColor}">${app.confidence}%</span>
+                            </div>
+                            <p class="mb-1"><strong>${app.power}W</strong> current draw</p>
+                            <p class="mb-0 text-muted">
+                                <small>Cost: ₹${app.cost_per_hour}/hour</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>`;
+        });
+        
+        container.innerHTML = html;
+    }
+    
+    // Get Bootstrap icon for appliance type
+    function getApplianceIcon(name) {
+        const icons = {
+            'Air Conditioner': 'snow',
+            'Water Heater/Geyser': 'droplet-fill',
+            'Refrigerator': 'box',
+            'Washing Machine': 'basket',
+            'Microwave': 'cpu',
+            'Electric Iron': 'thermometer-sun',
+            'Television': 'tv',
+            'Ceiling Fan': 'fan',
+            'LED Lights': 'lightbulb',
+            'Laptop/Computer': 'laptop',
+            'Electric Kettle': 'cup-hot',
+            'Mixer Grinder': 'tornado'
+        };
+        return icons[name] || 'plug';
+    }
+    
+    // Update Cost Comparison Widget
+    function updateCostComparison(monthlyEstimate, todayConsumption) {
+        // Average household consumption for Karnataka (typical 2-3 BHK)
+        const avgMonthlyKwh = 250; // kWh per month
+        const avgDailyKwh = avgMonthlyKwh / 30;
+        
+        // Calculate user's projected monthly consumption
+        const userMonthlyKwh = monthlyEstimate || 0;
+        
+        // Calculate percentage difference
+        let percentDiff = 0;
+        if (avgMonthlyKwh > 0) {
+            percentDiff = ((avgMonthlyKwh - userMonthlyKwh) / avgMonthlyKwh) * 100;
+        }
+        
+        // Update UI
+        document.getElementById('user-usage').textContent = userMonthlyKwh.toFixed(1) + ' kWh';
+        document.getElementById('avg-usage').textContent = avgMonthlyKwh + ' kWh';
+        
+        // Calculate cost savings (avg ₹6.5/kWh)
+        const savings = Math.max(0, (avgMonthlyKwh - userMonthlyKwh) * 6.5);
+        document.getElementById('savings-amount').textContent = '₹' + savings.toFixed(0);
+        
+        // Update percentage and circle
+        const percentElement = document.getElementById('comparison-percent');
+        const circle = document.getElementById('comparison-circle');
+        
+        if (percentDiff > 0) {
+            // User is using LESS than average (good!)
+            percentElement.textContent = Math.abs(percentDiff).toFixed(0) + '%';
+            percentElement.className = 'mb-0 text-success';
+            percentElement.nextElementSibling.textContent = 'less';
+            
+            // Update circle (green)
+            const circumference = 314; // 2 * π * r (r=50)
+            const offset = circumference - (circumference * Math.abs(percentDiff) / 100);
+            circle.setAttribute('stroke-dashoffset', offset);
+            circle.setAttribute('stroke', '#28a745');
+            
+            // Update rank
+            if (percentDiff >= 40) {
+                document.getElementById('rank-text').textContent = 'Excellent!';
+                document.getElementById('percentile').textContent = '10%';
+            } else if (percentDiff >= 25) {
+                document.getElementById('rank-text').textContent = 'Great job!';
+                document.getElementById('percentile').textContent = '25%';
+            } else if (percentDiff >= 10) {
+                document.getElementById('rank-text').textContent = 'Good!';
+                document.getElementById('percentile').textContent = '40%';
+            } else {
+                document.getElementById('rank-text').textContent = 'Keep going!';
+                document.getElementById('percentile').textContent = '50%';
+            }
+        } else {
+            // User is using MORE than average
+            percentElement.textContent = Math.abs(percentDiff).toFixed(0) + '%';
+            percentElement.className = 'mb-0 text-warning';
+            percentElement.nextElementSibling.textContent = 'more';
+            
+            // Update circle (orange)
+            const circumference = 314;
+            const offset = circumference - (circumference * Math.min(Math.abs(percentDiff), 100) / 100);
+            circle.setAttribute('stroke-dashoffset', offset);
+            circle.setAttribute('stroke', '#ffc107');
+            
+            // Update rank
+            document.getElementById('rank-text').textContent = 'Room to improve';
+            document.getElementById('percentile').textContent = '60%';
+        }
+    }
+    
+    // Load daily consumption data
+    function loadDailyData() {
+        fetch('/dashboard/api/chart-data/daily')
+            .then(response => response.json())
+            .then(data => {
+                dailyChart.data.labels = data.labels;
+                dailyChart.data.datasets[0].data = data.consumption;
+                dailyChart.update();
+            })
+            .catch(error => console.error('Error loading daily data:', error));
+    }
+    
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        initCharts();
+        updateLiveData();
+        
+        // Update every 5 seconds
+        setInterval(updateLiveData, 5000);
+    });
+</script>
+{% endblock %}
