@@ -104,6 +104,11 @@ It includes:
 - branch and PR flow
 - commit message format
 
-## 8. License
+## 8. Project Standards
 
-Add a license file before public release (recommended: MIT).
+- Contribution process: `CONTRIBUTING.md`
+- Security reporting policy: `SECURITY.md`
+
+## 9. License
+
+This project is licensed under the MIT License. See `LICENSE`.
