@@ -109,6 +109,15 @@ It includes:
 - Contribution process: `CONTRIBUTING.md`
 - Security reporting policy: `SECURITY.md`
 
-## 9. License
+## 9. Collaboration and CI
+
+- Issue templates and PR template are configured in `.github/`
+- Basic CI runs on push/PR to `main` via `.github/workflows/ci.yml`
+
+## 10. Release Notes
+
+- Current draft release notes: `RELEASE_NOTES_v1.0.0.md`
+
+## 11. License
 
 This project is licensed under the MIT License. See `LICENSE`.
