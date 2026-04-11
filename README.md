@@ -9,6 +9,8 @@ EnergyTrack is a Flask-based energy monitoring platform with:
 
 This README is intentionally short and product-focused.
 
+Originally developed as a Semester V Project Based Learning (PBL) project, this repository is now maintained as a production-style portfolio project.
+
 ## 1. Tech Stack
 
 - Python 3.10+
